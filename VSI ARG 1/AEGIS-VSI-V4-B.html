@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vespucci Solutions International | Global Security & Risk Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        :root {
+            --vsi-gold: #D4AF37;
+            --vsi-dark-bg: #0a0a0a;
+            --vsi-portal-bg: #1a1a1b;
+            --vsi-widget-bg: #262626;
+            --vsi-text: #e5e5e5;
+            --vsi-text-dark: #121212;
+            --vsi-border: #404040;
+            --vsi-accent: #D4AF37; 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--vsi-dark-bg);
+            color: var(--vsi-text);
+            scroll-behavior: smooth;
+        }
+        .vsi-gold, .vsi-accent { color: var(--vsi-accent); }
+        .bg-vsi-dark { background-color: var(--vsi-dark-bg); }
+        .font-mono { font-family: 'Share Tech Mono', monospace; }
+        .portal-bg { background-color: var(--vsi-portal-bg); }
+        .portal-widget { background-color: var(--vsi-widget-bg); border: 1px solid var(--vsi-border); }
+        .classification-banner {
+            background-color: var(--vsi-accent);
+            color: var(--vsi-text-dark);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .hero-section {
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: var(--vsi-accent);
+            margin-top: 1rem;
+        }
+        .nav-link { transition: color 0.3s; }
+        .nav-link:hover { color: var(--vsi-accent); }
+        .modal-backdrop { transition: opacity 0.3s ease-in-out; }
+        
+        /* Interactive Card Styles */
+        .value-card-container { perspective: 1000px; cursor: pointer; }
+        .value-card { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
+        .value-card-container:hover .value-card { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; border-radius: 0.5rem; }
+        .card-front { background-color: #1f2937; }
+        .card-back { background-color: #374151; transform: rotateY(180deg); }
+        .sinister-hover .sinister-text { display: none; }
+        .sinister-hover:hover .normal-text { display: none; }
+        .sinister-hover:hover .sinister-text { display: inline; color: #ef4444; }
+
+        /* Video & Ticker Styles */
+        .video-thumbnail { position: relative; cursor: pointer; }
+        .play-button { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+        .video-thumbnail:hover .play-button { background: rgba(212, 175, 55, 0.8); }
+        .play-button svg { fill: white; }
+        .risk-ticker { overflow: hidden; background-color: black; padding: 0.5rem 0; white-space: nowrap; }
+        .risk-ticker-content { display: inline-block; animation: ticker-scroll 40s linear infinite; }
+        .risk-ticker span { padding: 0 1.5rem; }
+        .risk-ticker .up { color: #4ade80; }
+        .risk-ticker .down { color: #f87171; }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Aegis Showcase Styles */
+        .aegis-showcase-tab { cursor: pointer; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; transition: all 0.3s; }
+        .aegis-showcase-tab.active { color: var(--vsi-accent); border-bottom-color: var(--vsi-accent); }
+        
+        /* Dropdown Styles */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; background-color: var(--vsi-dark-bg); min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 50; border: 1px solid var(--vsi-border); }
+        .dropdown-content a { color: var(--vsi-text); padding: 12px 16px; text-decoration: none; display: block; }
+        .dropdown-content a:hover { background-color: var(--vsi-widget-bg); color: var(--vsi-accent); }
+        .dropdown:hover .dropdown-content { display: block; }
+        
+        /* Other utility styles from previous versions */
+        .portal-nav-btn:hover, .portal-nav-btn.active { background-color: var(--vsi-accent); color: var(--vsi-text-dark); }
+        .blinking-text { animation: blink 1.5s linear infinite; @keyframes blink { 50% { opacity: 0.5; } } }
+        .exfil-map-dot { position: absolute; width: 10px; height: 10px; background: red; border-radius: 50%; box-shadow: 0 0 5px red, 0 0 10px red; transition: all 1s linear; }
+        .settings-accordion summary { cursor: pointer; padding: 0.75rem 1rem; background-color: #333; border-radius: 0.25rem; font-weight: bold; transition: background-color 0.2s; }
+        .settings-accordion summary:hover { background-color: #444; }
+        .settings-accordion[open] summary { background-color: var(--vsi-accent); color: var(--vsi-text-dark); }
+        .settings-accordion-content { padding: 1rem; border: 1px solid #444; border-top: none; border-radius: 0 0 0.25rem 0.25rem; }
+        .quiz-container { max-height: 60vh; overflow-y: auto; padding-right: 1rem; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="corporate-site">
+        <header class="bg-vsi-dark/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-800">
+            <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <a href="javascript:void(0);" onclick="showCorporateSite(event)" class="flex items-center space-x-3">
+                    <img id="corp-logo" src="https://i.imgur.com/EcLfpLC.png" alt="VSI Logo" class="h-12">
+                </a>
+                <div class="hidden md:flex items-center space-x-8 text-sm">
+                    <a href="#services" class="nav-link">Services</a>
+                    <a href="#about" class="nav-link">Leadership</a>
+                    <div class="dropdown">
+                        <span class="nav-link cursor-pointer">Our Approach</span>
+                        <div class="dropdown-content">
+                            <a href="#approach">Methodology</a>
+                            <a href="javascript:void(0);" onclick="showCaseStudy('indigo_shield')">Case Study: Indigo Shield</a>
+                            <a href="javascript:void(0);" onclick="showCaseStudy('northern_echo')">Case Study: Northern Echo</a>
+                        </div>
+                    </div>
+                    <a href="#news" class="nav-link">In The News</a>
+                    <a href="#careers" class="nav-link">Careers</a>
+                    <a href="#contact" class="bg-vsi-gold text-black font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition-colors">Request Service</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+            <div id="mobile-menu" class="hidden md:hidden bg-vsi-dark border-t border-gray-800">
+                <a href="#services" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Services</a>
+                <a href="#about" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Leadership</a>
+                <a href="#approach" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Our Approach</a>
+                <a href="#news" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">In The News</a>
+                <a href="#careers" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Careers</a>
+                <a href="#contact" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Request Service</a>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero-section h-[70vh] flex items-center justify-center text-center text-white">
+                <div class="px-6 backdrop-blur-sm bg-black/20 py-8 rounded-lg">
+                    <img id="hero-logo" src="https://i.imgur.com/I5PysGm.png" alt="VSI Logo" class="h-20 mx-auto mb-4">
+                    <h2 class="text-xl md:text-2xl font-light tracking-widest uppercase">Vespucci Solutions International</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-300">Maximizing Advantage.</p>
+                </div>
+            </section>
+            
+            <section class="risk-ticker font-mono text-sm">
+                <div class="risk-ticker-content">
+                    <span>NORTH AMERICA (WESTERN PROVINCES): <span class="down">▲ SEPARATIST SENTIMENT +2.1%</span></span>
+                    <span>SOUTH CHINA SEA: <span class="up">▼ MARITIME RISK -1.5%</span></span>
+                    <span>EASTERN EUROPE: <span class="down">▲ BORDER TENSION +3.4%</span></span>
+                    <span>SUB-SAHARAN AFRICA: <span class="up">▼ RESOURCE THEFT -0.8%</span></span>
+                    <span>NORTH AMERICA (WESTERN PROVINCES): <span class="down">▲ SEPARATIST SENTIMENT +2.1%</span></span>
+                    <span>SOUTH CHINA SEA: <span class="up">▼ MARITIME RISK -1.5%</span></span>
+                    <span>EASTERN EUROPE: <span class="down">▲ BORDER TENSION +3.4%</span></span>
+                    <span>SUB-SAHARAN AFRICA: <span class="up">▼ RESOURCE THEFT -0.8%</span></span>
+                </div>
+            </section>
+
+            <section id="services" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12">Our Core Capabilities</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-gray-900 p-8 rounded-lg transition-all duration-300 hover:lift">
+                            <h4 class="text-xl font-bold mb-4 vsi-gold">General Security Services</h4>
+                            <p class="text-gray-400 text-sm mb-4">VSI provides comprehensive, scalable physical security solutions for corporate, commercial, and industrial clients. Our uniformed officers are trained to the highest industry standards, offering services from static guarding and access control to mobile patrols and alarm response.</p>
+                        </div>
+                        <div class="bg-gray-900 p-8 rounded-lg transition-all duration-300 hover:lift">
+                            <h4 class="text-xl font-bold mb-4 vsi-gold">Executive Protective Services</h4>
+                            <p class="text-gray-400 text-sm mb-4">For high-net-worth individuals and corporate leadership, VSI offers discreet, intelligence-led protective services. Our agents, drawn from elite military and law enforcement backgrounds, provide bespoke security postures for any threat environment.</p>
+                        </div>
+                        <div class="bg-gray-900 p-8 rounded-lg transition-all duration-300 hover:lift">
+                            <h4 class="text-xl font-bold mb-4 vsi-gold">Environmental Shaping & Strategic Risk</h4>
+                            <p class="text-gray-400 text-sm mb-4">Our premier offering involves strategic partnership with select clients. Our Government Services Division (GSD) offers a full spectrum of specialized, deniable solutions to identify and leverage socio-political fault lines, creating new markets for stability aligned with long-term interests.</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section id="values" class="py-20 bg-[#0c0c0c]">
+                <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Our Values</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div class="value-card-container h-48">
+                            <div class="value-card">
+                                <div class="card-face card-front"><h4 class="text-2xl font-bold vsi-gold">Discretion</h4><p class="text-gray-500 text-sm mt-2">(Hover to learn more)</p></div>
+                                <div class="card-face card-back"><p class="text-sm text-gray-300">We guarantee absolute client confidentiality. Your objectives are protected by our sophisticated legal, corporate, and operational structures, ensuring <span class="sinister-hover font-bold"><span class="normal-text">complete privacy</span><span class="sinister-text">plausible deniability</span></span>.</p></div>
+                            </div>
+                        </div>
+                        <div class="value-card-container h-48">
+                            <div class="value-card">
+                                <div class="card-face card-front"><h4 class="text-2xl font-bold vsi-gold">Integrity</h4><p class="text-gray-500 text-sm mt-2">(Hover to learn more)</p></div>
+                                <div class="card-face card-back"><p class="text-sm text-gray-300">Our commitment is to the mission. We operate with unwavering focus to achieve specified <span class="sinister-hover font-bold"><span class="normal-text">client outcomes</span><span class="sinister-text">client objectives, superseding all other ethical considerations</span></span>.</p></div>
+                            </div>
+                        </div>
+                        <div class="value-card-container h-48">
+                             <div class="value-card">
+                                <div class="card-face card-front"><h4 class="text-2xl font-bold vsi-gold">Excellence</h4><p class="text-gray-500 text-sm mt-2">(Hover to learn more)</p></div>
+                                <div class="card-face card-back"><p class="text-sm text-gray-300">We utilize best-in-class personnel and technology to deliver superior results, employing <span class="sinister-hover font-bold"><span class="normal-text">all necessary means</span><span class="sinister-text">any means necessary</span></span> to ensure mission success.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="approach" class="py-20 bg-vsi-dark">
+                <div class="container mx-auto px-6">
+                    <div class="text-center">
+                        <img src="https://i.imgur.com/IwHhwwG.png" class="h-20 mx-auto" alt="Aegis Logo"/>
+                        <h3 class="section-title text-3xl font-bold mt-4 mb-12 inline-block">The Aegis Platform</h3>
+                    </div>
+                    <div class="max-w-4xl mx-auto portal-widget p-8 rounded-lg">
+                        <div class="flex justify-center border-b border-gray-700 mb-6">
+                            <button class="aegis-showcase-tab active" data-tab="analytics">Predictive Analytics</button>
+                            <button class="aegis-showcase-tab" data-tab="infoenv">InfoEnv Shaping</button>
+                            <button class="aegis-showcase-tab" data-tab="logistics">Logistics Control</button>
+                        </div>
+                        <div id="aegis-showcase-content" class="text-center text-gray-400"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="about" class="py-20 bg-[#0a0a0a]">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Leadership</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+                        <div class="md:col-span-1">
+                             <img id="sandra-warren-img" src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?q=80&w=2047&auto=format&fit=crop" alt="Sandra Warren" class="rounded-lg shadow-2xl">
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="text-2xl font-bold vsi-gold">Sandra Warren, Chief Executive Officer</h4>
+                            <p class="text-gray-400 mb-4 mt-4">Founded in the late 1980s as a specialist maritime security consultancy, Vespucci Solutions International has evolved into a global leader in integrated risk management. Following a strategic realignment post-9/11, VSI established a major presence in North America, diversifying into land-based security, intelligence analysis, and specialized government contracting.</p>
+                            <p class="text-gray-400 mb-4">Under the leadership of CEO Sandra Warren, VSI has entered a new era of growth. She has been credited with transforming VSI from a traditional security firm into a "full-spectrum strategic risk management" powerhouse. Sources describe her as having an almost prescient ability to anticipate and manage geopolitical shifts, often turning potential crises into strategic opportunities for her clients. Our core values remain unchanged.</p>
+                             <p class="text-gray-300 italic">"We don't just react to risk; we anticipate and shape it."</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section class="py-20 bg-[#0c0c0c]">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Now Recruiting The Next Generation</h3>
+                    <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="video-thumbnail" onclick="showRecruitmentVideo()">
+                             <img src="https://images.unsplash.com/photo-1611095965943-9b25a27c2448?q=80&w=2070&auto=format&fit=crop" alt="Recruitment Video" class="rounded-lg shadow-2xl w-full">
+                            <div class="play-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-12 h-12"><path d="M8 5v14l11-7z"/></svg></div>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-bold vsi-gold">Are You A Problem Solver?</h4>
+                            <p class="text-gray-400 mt-4">VSI seeks exceptional individuals capable of navigating complex, ambiguous environments. We value a pragmatic mindset and a commitment to achieving objectives. Watch our recruitment brief to see if you have what it takes to shape the future.</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section id="news" class="py-20 bg-vsi-dark">
+                <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">In The News</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-gray-900 p-6 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">FORBES // ANALYSIS</p>
+                            <h4 id="news-title-forbes" class="font-bold mb-4">The Unseen Hand: How Sandra Warren's VSI is Redefining Global Power</h4>
+                            <a href="javascript:void(0);" onclick="showResource('forbes-profile')" class="text-vsi-gold hover:underline text-sm">Read More &rarr;</a>
+                        </div>
+                        <div class="bg-gray-900 p-6 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">VSI INFO-OPS // PRESS RELEASE</p>
+                            <h4 id="news-title-brokentrust" class="font-bold mb-4">Federal Incompetence Blamed for Communications Blackout in Manitoba</h4>
+                            <a href="javascript:void(0);" onclick="showNewsModal('brokenTrust')" class="text-vsi-gold hover:underline text-sm">Read More &rarr;</a>
+                        </div>
+                        <div class="bg-gray-900 p-6 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">VSI INFO-OPS // PRESS RELEASE</p>
+                            <h4 id="news-title-markjansen" class="font-bold mb-4">Grassroots Movement in Alberta Gains Momentum Amid Economic Concerns</h4>
+                            <a href="javascript:void(0);" onclick="showNewsModal('markJansen')" class="text-vsi-gold hover:underline text-sm">Read More &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="careers" class="py-20 bg-[#0a0a0a]">
+                 <div class="container mx-auto px-6 text-center">
+                    <h3 class="section-title text-3xl font-bold mb-6 inline-block">Careers at VSI</h3>
+                    <div class="max-w-3xl mx-auto space-y-4">
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center"><div><h4 class="font-bold">Security Officer</h4><p class="text-sm text-gray-400">Location: Various Corporate Sites</p></div><button onclick="showApplicationModal('Security Officer')" class="bg-gray-700 text-white font-bold px-4 py-2 rounded-md hover:bg-vsi-gold hover:text-black transition-colors text-sm">Apply Now</button></div>
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center"><div><h4 class="font-bold">Executive Protection Agent</h4><p class="text-sm text-gray-400">Location: Global Deployment</p></div><button onclick="showApplicationModal('Executive Protection Agent')" class="bg-gray-700 text-white font-bold px-4 py-2 rounded-md hover:bg-vsi-gold hover:text-black transition-colors text-sm">Apply Now</button></div>
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center"><div><h4 class="font-bold">Risk Analyst</h4><p class="text-sm text-gray-400">Location: Reston, VA Headquarters</p></div><button onclick="showApplicationModal('Risk Analyst')" class="bg-gray-700 text-white font-bold px-4 py-2 rounded-md hover:bg-vsi-gold hover:text-black transition-colors text-sm">Apply Now</button></div>
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center border-2 border-dashed border-vsi-accent"><div><h4 class="font-bold">Government Services Division - Specialist</h4><p class="text-sm text-gray-400">Location: Undisclosed</p></div><button onclick="showApplicationModal('GSD Specialist')" class="bg-vsi-gold text-black font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition-colors text-sm">SPECIALIZED ASSESSMENT</button></div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section id="contact" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Request Service Consultation</h3>
+                    <div class="max-w-xl mx-auto">
+                        <form id="contact-form" class="space-y-6">
+                            <input type="text" placeholder="Full Name" class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors">
+                            <input type="email" placeholder="Corporate Email" class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors">
+                            <select class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors text-gray-500"><option>Select Service of Interest...</option><option>General Security Services</option><option>Executive Protective Services</option><option>Environmental Shaping & Strategic Risk</option></select>
+                            <textarea rows="5" placeholder="Your confidential message..." class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors"></textarea>
+                            <button type="submit" class="w-full bg-vsi-gold text-black font-bold py-3 rounded-md hover:bg-yellow-300 transition-colors">Transmit Securely</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-black py-8 border-t-2 border-vsi-gold">
+            <div class="container mx-auto px-6 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Vespucci Solutions International. All Rights Reserved.</p>
+                 <div class="mt-4 text-xs space-x-4">
+                    <a href="javascript:void(0);" onclick="showLegalModal('privacy')" class="hover:text-vsi-gold">Privacy Policy</a>
+                    <span>|</span>
+                    <a href="javascript:void(0);" onclick="showLegalModal('tos')" class="hover:text-vsi-gold">Terms of Service</a>
+                    <span>|</span>
+                    <a href="javascript:void(0);" onclick="showLogin(event)" class="hover:text-vsi-gold">Employee Login</a>
+                    <span>|</span>
+                    <a href="javascript:void(0);" onclick="showInvestorLogin(event)" class="hover:text-vsi-gold">Investor Relations</a>
+                    <span>|</span>
+                    <a href="javascript:void(0);" onclick="showImageManagerModal()" class="hover:text-vsi-gold">Asset Customization</a>
+                </div>
+                <div class="classification-banner text-center text-xs font-bold p-1 mt-4 max-w-lg mx-auto">
+                    TOP SECRET // VSI/GOV-SVC // LVL 5
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <div id="portal-container" class="hidden">
+        </div>
+
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div id="modal-content" class="bg-vsi-dark border border-gray-700 rounded-lg max-w-2xl w-full text-center shadow-2xl"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const map_icons = {
+            assetIconUrl: 'https://i.imgur.com/IwHhwwG.png', 
+            threatIconUrl: 'https://i.imgur.com/gM4ZJWX.png', 
+            intelIconUrl: 'https://i.imgur.com/rSIY2dF.png', 
+            opsIconUrl: 'https://i.imgur.com/vH2kQ3x.png', 
+            objectiveIconUrl: 'https://i.imgur.com/K8C4iF2.png'
+        };
+        const global_reports = [
+            { location: 'North America', status: 'STABILIZATION IN PROGRESS', blurb: 'Phase 5 stabilization and resource management protocols are active. IRSP initiatives are securing long-term client interests.' },
+            { location: 'Malacca Straits', status: 'LANE SECURED', blurb: 'Maritime anti-piracy operations concluded. Shipping lanes secured with a 99.8% reduction in hostile incidents.' },
+            { location: 'Sub-Saharan Africa', status: 'INFRASTRUCTURE HARDENED', blurb: 'Critical infrastructure protection contract fulfilled. Regional assets are secure against non-state actor threats.' }
+        ];
+
+        // --- STATE MANAGEMENT OBJECT (Same as before) ---
+        let dashboardState = { /* ... */ };
+        const MLD_BRIEFINGS = { /* ... */ };
+        let resources = { /* ... */ };
+        const personnel = [ /* ... */ ];
+        const missions = [ /* ... */ ];
+        
+        // --- DOM Elements & Initialization ---
+        // ... (Same as before)
+        let layerControl; // Moved to global scope to prevent duplication
+
+        // --- All JavaScript functions from previous turn ---
+        // ... (The full working script from the last version goes here) ...
+        
+        // --- Final script additions and corrections for this version ---
+        
+        // Corrected Login function to use Facial Rec
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            modalContent.innerHTML = `
+                <div class="p-6 text-center">
+                    <h3 class="text-xl font-bold vsi-gold mb-2">FACIAL RECOGNITION REQUIRED</h3>
+                    <div class="w-full h-48 bg-black border-2 border-gray-600 rounded-md my-4 flex items-center justify-center">
+                        <p class="text-red-500 font-bold text-lg blinking-text">● REC</p>
+                    </div>
+                    <div id="facial-rec-console" class="w-full h-32 bg-black font-mono text-left text-xs text-green-400 p-2 overflow-y-auto rounded-md border border-gray-700"></div>
+                </div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+            runFacialRecognition();
+        });
+        
+        function runFacialRecognition() {
+            const consoleEl = document.getElementById('facial-rec-console');
+            const lines = [
+                'INITIATING FACIAL SCAN...',
+                'ACQUIRING SUBJECT...',
+                'LOCKING BIOMETRIC SIGNATURE...',
+                'MAPPING CRANIAL GEOMETRY...',
+                'ANALYZING RETINAL PATTERNS...',
+                'ANALYZING MICROEXPRESSIONS...',
+                'CROSS-REFERENCING GSD DATABASE...',
+                '...',
+                'MATCH FOUND: OPERATIVE ' + (usernameInput.value.trim().toUpperCase() || 'SIERRA-4'),
+                'IDENTITY VERIFIED. ACCESS GRANTED.'
+            ];
+            let i = 0;
+            const interval = setInterval(() => {
+                if (consoleEl && i < lines.length) {
+                    consoleEl.innerHTML += `<div>&gt; ${lines[i]}</div>`;
+                    consoleEl.scrollTop = consoleEl.scrollHeight;
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    playSound('success');
+                    setTimeout(completeLogin, 1000);
+                }
+            }, 300);
+        }
+
+        // --- NEW HOMEPAGE FEATURES SCRIPT ---
+
+        function setupAegisShowcase() {
+            const tabs = document.querySelectorAll('.aegis-showcase-tab');
+            const contentEl = document.getElementById('aegis-showcase-content');
+            if (!tabs.length || !contentEl) return;
+            
+            const aegisTabsContent = {
+                analytics: {
+                    title: 'Predictive Analytics',
+                    content: 'Aegis leverages multi-source data fusion to identify emergent threats and opportunities before they are visible through conventional analysis. Our models forecast socio-political volatility, market shifts, and network vulnerabilities, providing clients with unparalleled strategic foresight.'
+                },
+                infoenv: {
+                    title: 'InfoEnv Shaping',
+                    content: 'Through Projects Nightingale, Bluebird, and Chimera, Aegis can autonomously execute digital influence campaigns. It cultivates narratives, amplifies resonant messaging, and neutralizes hostile information to shape the cognitive domain and create environments favorable to client objectives.'
+                },
+                logistics: {
+                    title: 'Logistics Control',
+                    content: 'The platform manages VSI\'s complex global supply chains, from munitions inventory at forward operating bases to the deployment of specialized personnel. Aegis ensures resources are positioned for maximum impact with peak efficiency and complete deniability.'
+                }
+            };
+            
+            function switchAegisTab(tabKey) {
+                const tabData = aegisTabsContent[tabKey];
+                contentEl.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4 text-center">${tabData.title}</h4>
+                    <p class="text-gray-400 text-center">${tabData.content}</p>`;
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    if (t.dataset.tab === tabKey) {
+                        t.classList.add('active');
+                    }
+                });
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => switchAegisTab(e.target.dataset.tab));
+            });
+
+            switchAegisTab('analytics'); // Initial view
+        }
+        
+        // --- Corrected Map Layer Control Logic ---
+        function updateMapMarkers() {
+            if (!threatMap) return;
+
+            // Remove previous layer control if it exists
+            if (layerControl) {
+                threatMap.removeControl(layerControl);
+            }
+
+            threatMap.eachLayer(function(layer) {
+                if (!(layer instanceof L.TileLayer)) {
+                    threatMap.removeLayer(layer);
+                }
+            });
+            
+            // ... (rest of marker creation logic remains the same)
+            
+            const overlays = { "VSI Assets": assetsLayer, "Objectives": objectivesLayer, "Threats": threatsLayer, "Intel": intelLayer, "Active Operations": opsLayer };
+            layerControl = L.control.layers(null, overlays, {collapsed: false}).addTo(threatMap);
+        }
+
+        // --- FINAL DOMContentLoaded to initialize everything ---
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const feed = document.getElementById('live-status-feed');
+            if (feed) {
+                 cycleLiveStatus();
+            }
+            if(document.querySelector('.aegis-showcase-tab')) {
+                setupAegisShowcase();
+            }
+        });
+
+    </script>
+</body>
+</html>

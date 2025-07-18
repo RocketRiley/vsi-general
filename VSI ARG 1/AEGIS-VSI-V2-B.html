@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vespucci Solutions International | Global Security & Risk Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        :root {
+            --vsi-gold: #D4AF37;
+            --vsi-dark-bg: #0a0a0a;
+            --vsi-portal-bg: #1a1a1b;
+            --vsi-widget-bg: #262626;
+            --vsi-text: #e5e5e5;
+            --vsi-text-dark: #121212;
+            --vsi-border: #404040;
+            --vsi-accent: #D4AF37; 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--vsi-dark-bg);
+            color: var(--vsi-text);
+            scroll-behavior: smooth;
+        }
+        .portal-bg {
+            cursor: crosshair;
+        }
+        .hero-section {
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .vsi-gold, .vsi-accent { color: var(--vsi-accent); }
+        .bg-vsi-dark { background-color: var(--vsi-dark-bg); }
+        .border-vsi-gold, .border-vsi-accent { border-color: var(--vsi-accent); }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: var(--vsi-accent);
+            margin-top: 1rem;
+        }
+        .nav-link { transition: color 0.3s; }
+        .nav-link:hover { color: var(--vsi-accent); }
+        .modal-backdrop { transition: opacity 0.3s ease-in-out; }
+        .font-mono { font-family: 'Share Tech Mono', monospace; }
+        .portal-bg { background-color: var(--vsi-portal-bg); }
+        .portal-widget { background-color: var(--vsi-widget-bg); border: 1px solid var(--vsi-border); }
+        .portal-nav-btn {
+            background-color: #333;
+            color: var(--vsi-text);
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .portal-nav-btn:hover, .portal-nav-btn.active {
+            background-color: var(--vsi-accent);
+            color: var(--vsi-text-dark);
+        }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        .blinking-text { animation: blink 1.5s linear infinite; }
+        .progress-bar { background-color: #404040; border-radius: 5px; overflow: hidden; }
+        .progress-bar-inner { background-color: var(--vsi-accent); height: 100%; transition: width 0.5s ease-in-out; }
+        .password-container {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        .typing-effect {
+            overflow: hidden;
+            border-right: .15em solid var(--vsi-accent);
+            white-space: nowrap;
+            letter-spacing: .1em;
+            animation: typing 3s steps(30, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--vsi-accent); }
+        }
+        .quiz-option {
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-option:hover {
+            background-color: #404040;
+            border-color: var(--vsi-accent);
+        }
+        .quiz-option.selected {
+            background-color: var(--vsi-accent);
+            color: var(--vsi-text-dark);
+            border-color: var(--vsi-accent);
+        }
+        .threat-ticker-container {
+            width: 100%;
+            overflow: hidden;
+        }
+        .threat-ticker {
+            animation: ticker-scroll 60s linear infinite;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .classification-banner {
+            background-color: var(--vsi-accent);
+            color: var(--vsi-text-dark);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .animated-bg {
+            background: linear-gradient(-45deg, var(--vsi-portal-bg), #2a2a2b, var(--vsi-portal-bg), #2a2a2b);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        #threat-map { 
+            height: 70vh; 
+            background-color: #000;
+            border: 1px solid var(--vsi-border);
+            border-radius: 0.5rem;
+        }
+        .leaflet-tile-pane {
+            filter: grayscale(1) brightness(0.5) contrast(1.2);
+        }
+        .leaflet-control-layers-toggle {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQxIDAtOC0zLjU5LTgtOHMzLjU5LTggOC04IDggMy41OSA4IDh6bS0xLTZoMnYyaC0yem0wLTRoMnYyaC0yeiIvPjwvc3ZnPg==) !important;
+            width: 36px !important;
+            height: 36px !important;
+            background-size: 26px 26px !important;
+        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: var(--vsi-widget-bg) !important;
+            color: var(--vsi-text) !important;
+            border: 1px solid var(--vsi-border) !important;
+        }
+        .finance-tab.active {
+            border-bottom-color: var(--vsi-accent);
+            color: var(--vsi-accent);
+        }
+        .quiz-container {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        @keyframes glitch-effect {
+          0% { transform: translate(0); }
+          20% { transform: translate(-3px, 3px); }
+          40% { transform: translate(-3px, -3px); }
+          60% { transform: translate(3px, 3px); }
+          80% { transform: translate(3px, -3px); }
+          100% { transform: translate(0); }
+        }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--vsi-dark-bg);
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0);
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            animation: glitch-effect 2s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            animation: glitch-effect 2s infinite linear alternate-reverse;
+        }
+        .hidden-link {
+            color: #D4AF38; 
+            cursor: pointer;
+        }
+        
+        .exfil-map-dot {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: red; border-radius: 50%;
+            box-shadow: 0 0 5px red, 0 0 10px red;
+            transition: all 1s linear;
+        }
+        .settings-accordion summary {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            background-color: #333;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .settings-accordion summary:hover {
+            background-color: #444;
+        }
+        .settings-accordion[open] summary {
+            background-color: var(--vsi-accent);
+            color: var(--vsi-text-dark);
+        }
+        .settings-accordion-content {
+            padding: 1rem;
+            border: 1px solid #444;
+            border-top: none;
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="corporate-site">
+        <header class="bg-vsi-dark/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-800">
+            <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <a href="#" onclick="showCorporateSite(event)" class="flex items-center space-x-3">
+                    <img id="corp-logo" src="https://i.imgur.com/8V72iB3.png" alt="VSI Logo" class="h-12">
+                </a>
+                <div class="hidden md:flex items-center space-x-8 text-sm">
+                    <a href="#services" class="nav-link">Services</a>
+                    <a href="#about" class="nav-link">Leadership</a>
+                    <a href="#approach" class="nav-link">Approach</a>
+                    <a href="#news" class="nav-link">In The News</a>
+                    <a href="#careers" class="nav-link">Careers</a>
+                    <a href="#contact" class="bg-vsi-gold text-black font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition-colors">Request Service</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+            <div id="mobile-menu" class="hidden md:hidden bg-vsi-dark border-t border-gray-800">
+                <a href="#services" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Services</a>
+                <a href="#about" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Leadership</a>
+                <a href="#approach" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Approach</a>
+                <a href="#news" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">In The News</a>
+                <a href="#careers" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Careers</a>
+                <a href="#contact" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Request Service</a>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero-section h-[70vh] flex items-center justify-center text-center text-white">
+                <div class="px-6 backdrop-blur-sm bg-black/20 py-8 rounded-lg">
+                    <img id="hero-logo" src="https://i.imgur.com/8V72iB3.png" alt="VSI Logo" class="h-20 mx-auto mb-4">
+                    <h2 class="text-xl md:text-2xl font-light tracking-widest uppercase">Vespucci Solutions International</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-300">Maximizing Advantage.</p>
+                </div>
+            </section>
+            
+            <section id="services" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12">Our Core Capabilities</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-gray-900 p-8 rounded-lg transition-all duration-300 hover-lift">
+                            <h4 class="text-xl font-bold mb-4 vsi-gold">General Security Services</h4>
+                            <p class="text-gray-400 text-sm mb-4">VSI provides comprehensive, scalable physical security solutions for corporate, commercial, and industrial clients. Our uniformed officers are trained to the highest industry standards, offering services from static guarding and access control to mobile patrols and alarm response. We create a visible, professional deterrent, safeguarding assets and ensuring a secure environment for your personnel and operations.</p>
+                        </div>
+                        <div class="bg-gray-900 p-8 rounded-lg transition-all duration-300 hover-lift">
+                            <h4 class="text-xl font-bold mb-4 vsi-gold">Executive Protective Services</h4>
+                            <p class="text-gray-400 text-sm mb-4">For high-net-worth individuals, corporate leadership, and their families, VSI offers discreet, intelligence-led protective services. Our agents, drawn from elite military and law enforcement backgrounds, provide bespoke security postures for any threat environment, encompassing close protection details, secure transportation, residential security, and advanced technical surveillance counter-measures (TSCM).</p>
+                        </div>
+                        <div class="bg-gray-900 p-8 rounded-lg transition-all duration-300 hover-lift">
+                            <h4 class="text-xl font-bold mb-4 vsi-gold">Environmental Shaping & Strategic Risk</h4>
+                            <p class="text-gray-400 text-sm mb-4">Our premier offering involves strategic partnership with multinational corporations and public sector entities. We provide deep geopolitical risk analysis and critical infrastructure protection, but our core competency lies in proactively shaping complex operating environments. For select clients, our Government Services Division (GSD) offers a full spectrum of specialized, deniable solutions to identify and leverage socio-political fault lines, creating new markets for stability aligned with long-term interests.</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+             <section id="approach" class="py-20 bg-[#0a0a0a]">
+                <div class="container mx-auto px-6 text-center">
+                    <h3 class="section-title text-3xl font-bold mb-12 inline-block">Our Approach</h3>
+                    <div class="max-w-4xl mx-auto text-left grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                             <h4 class="text-xl font-bold vsi-gold">Proactive Environmental Shaping</h4>
+                             <p class="text-gray-400">Traditional risk management is reactive. It waits for a threat to emerge before acting. At VSI, we believe true security comes from proactively shaping the operational environment to be inhospitable to threats. We identify latent risks, socio-political fault lines, and narrative vacuums, then implement data-driven strategies to create conditions favorable to our clients' long-term objectives. We don't just respond to the future; we <span class="hidden-link" onclick="showLogin(event)">build</span> it.</p>
+                        </div>
+                         <div class="space-y-4">
+                             <h4 class="text-xl font-bold vsi-gold">The Aegis Advantage</h4>
+                             <p class="text-gray-400">Our proprietary Aegis platform is the analytical engine driving our strategic advantage. It is a purely predictive AI that integrates multi-source intelligence, real-time sentiment analysis, and advanced modeling to provide unparalleled insight. Aegis allows us to move beyond simple mitigation by enabling pattern recognition, logistics management, and autonomous digital execution of influence campaigns, offering our clients a comprehensive, data-backed understanding of the chessboard.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="about" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Leadership</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+                        <div class="md:col-span-1">
+                             <img id="sandra-warren-img" src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?q=80&w=2047&auto=format&fit=crop" alt="Sandra Warren" class="rounded-lg shadow-2xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/121212/e5e5e5?text=Image+Not+Found';">
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="text-2xl font-bold vsi-gold">Sandra Warren, Chief Executive Officer</h4>
+                            <p class="text-gray-400 mb-4 mt-4">Founded in the late 1980s as a specialist maritime security consultancy, Vespucci Solutions International has evolved into a global leader in integrated risk management. Our history is built on operating successfully in the world's most challenging environments, from combating piracy in the Malacca Straits to securing critical assets in politically unstable regions.</p>
+                            <p class="text-gray-400 mb-4">Following a strategic realignment post-9/11, VSI established a major presence in North America, diversifying into land-based security, intelligence analysis, and specialized government contracting.</p>
+                            <p class="text-gray-400 mb-4">Under the leadership of CEO Sandra Warren, VSI has entered a new era of growth. She has been credited with transforming VSI from a traditional security firm into a "full-spectrum strategic risk management" powerhouse. Sources describe her as having an almost prescient ability to anticipate and manage geopolitical shifts, often turning potential crises into strategic opportunities for her clients. Our core values remain unchanged: absolute discretion, unwavering integrity, and the relentless pursuit of excellence.</p>
+                             <p class="text-gray-300 italic">"We don't just react to risk; we anticipate and shape it."</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section class="py-20 bg-[#0c0c0c]">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Global Theatre: Live Status</h3>
+                     <div class="max-w-4xl mx-auto bg-black p-6 rounded-lg border border-gray-800 font-mono text-sm">
+                        <div id="live-status-feed"></div>
+                     </div>
+                 </div>
+            </section>
+            
+            <section id="news" class="py-20 bg-vsi-dark">
+                <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">In The News</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-gray-900 p-6 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">FORBES // ANALYSIS</p>
+                            <h4 id="news-title-forbes" class="font-bold mb-4">The Unseen Hand: How Sandra Warren's VSI is Redefining Global Power</h4>
+                            <a href="#" onclick="showResource('forbes-profile')" class="text-vsi-gold hover:underline text-sm">Read More &rarr;</a>
+                        </div>
+                        <div class="bg-gray-900 p-6 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">VSI INFO-OPS // PRESS RELEASE</p>
+                            <h4 id="news-title-brokentrust" class="font-bold mb-4">Federal Incompetence Blamed for Communications Blackout in Manitoba</h4>
+                            <a href="#" onclick="showNewsModal('brokenTrust')" class="text-vsi-gold hover:underline text-sm">Read More &rarr;</a>
+                        </div>
+                        <div class="bg-gray-900 p-6 rounded-lg">
+                            <p class="text-xs text-gray-500 mb-2">VSI INFO-OPS // PRESS RELEASE</p>
+                            <h4 id="news-title-markjansen" class="font-bold mb-4">Grassroots Movement in Alberta Gains Momentum Amid Economic Concerns</h4>
+                            <a href="#" onclick="showNewsModal('markJansen')" class="text-vsi-gold hover:underline text-sm">Read More &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="careers" class="py-20 bg-[#0a0a0a]">
+                 <div class="container mx-auto px-6 text-center">
+                    <h3 class="section-title text-3xl font-bold mb-6 inline-block">Careers at VSI</h3>
+                    <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Vespucci Solutions International seeks exceptional individuals who demonstrate integrity, resilience, and a commitment to excellence. We offer unparalleled opportunities for growth in a dynamic, global organization. We value strategic thinkers, decisive actors, and professionals who understand the nuance of modern risk environments. All applicants undergo a rigorous vetting process.</p>
+                    <div class="max-w-3xl mx-auto space-y-4">
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center"><div><h4 class="font-bold">Security Officer</h4><p class="text-sm text-gray-400">Location: Various Corporate Sites</p></div><button onclick="showApplicationModal('Security Officer')" class="bg-gray-700 text-white font-bold px-4 py-2 rounded-md hover:bg-vsi-gold hover:text-black transition-colors text-sm">Apply Now</button></div>
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center"><div><h4 class="font-bold">Executive Protection Agent</h4><p class="text-sm text-gray-400">Location: Global Deployment</p></div><button onclick="showApplicationModal('Executive Protection Agent')" class="bg-gray-700 text-white font-bold px-4 py-2 rounded-md hover:bg-vsi-gold hover:text-black transition-colors text-sm">Apply Now</button></div>
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center"><div><h4 class="font-bold">Risk Analyst</h4><p class="text-sm text-gray-400">Location: Reston, VA Headquarters</p></div><button onclick="showApplicationModal('Risk Analyst')" class="bg-gray-700 text-white font-bold px-4 py-2 rounded-md hover:bg-vsi-gold hover:text-black transition-colors text-sm">Apply Now</button></div>
+                        <div class="bg-vsi-dark p-4 rounded-md flex justify-between items-center border-2 border-dashed border-vsi-accent"><div><h4 class="font-bold">Government Services Division - Specialist</h4><p class="text-sm text-gray-400">Location: Undisclosed</p></div><button onclick="showApplicationModal('GSD Specialist')" class="bg-vsi-gold text-black font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition-colors text-sm">SPECIALIZED ASSESSMENT</button></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="contact" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Request Service Consultation</h3>
+                    <div class="max-w-xl mx-auto">
+                        <p class="text-center text-gray-400 mb-8">For inquiries regarding our security solutions and strategic advisory services, please utilize the secure form below. A VSI client services director will respond within one business day. Absolute discretion is assured.</p>
+                        <form id="contact-form" class="space-y-6">
+                            <input type="text" placeholder="Full Name" class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors">
+                            <input type="email" placeholder="Corporate Email" class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors">
+                            <select class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors text-gray-500"><option>Select Service of Interest...</option><option>General Security Services</option><option>Executive Protective Services</option><option>Environmental Shaping & Strategic Risk</option></select>
+                            <textarea rows="5" placeholder="Your confidential message..." class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors"></textarea>
+                            <button type="submit" class="w-full bg-vsi-gold text-black font-bold py-3 rounded-md hover:bg-yellow-300 transition-colors">Transmit Securely</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-black py-8 border-t-2 border-vsi-gold">
+            <div class="container mx-auto px-6 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Vespucci Solutions International. All Rights Reserved.</p>
+                 <div class="mt-4 text-xs space-x-4">
+                    <a href="#" onclick="showLegalModal('privacy')" class="hover:text-vsi-gold">Privacy Policy</a>
+                    <span>|</span>
+                    <a href="#" onclick="showLegalModal('tos')" class="hover:text-vsi-gold">Terms of Service</a>
+                    <span>|</span>
+                    <a href="#" onclick="showLogin(event)" class="hover:text-vsi-gold">Employee Login</a>
+                    <span>|</span>
+                    <a href="#" onclick="showInvestorLogin(event)" class="hover:text-vsi-gold">Investor Relations</a>
+                    <span>|</span>
+                    <a href="#" onclick="showImageManagerModal()" class="hover:text-vsi-gold">Asset Customization</a>
+                </div>
+                <div class="classification-banner text-center text-xs font-bold p-1 mt-4 max-w-lg mx-auto">
+                    TOP SECRET // VSI/GOV-SVC // LVL 5
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div id="portal-container" class="hidden">
+        
+        <div id="login-screen" class="min-h-screen flex items-center justify-center bg-vsi-dark p-4 animated-bg">
+             <div class="max-w-md w-full p-8 space-y-8 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700">
+                <div class="text-center"><img id="aegis-logo" src="https://i.imgur.com/8V72iB3.png" alt="VSI Logo" class="h-16 mx-auto mb-4"><h2 class="text-2xl font-bold vsi-gold">Aegis Secure Portal</h2><p class="text-sm text-gray-400">VSI Internal Access</p></div>
+                <form id="login-form" class="space-y-4">
+                    <div><input id="username-input" type="text" placeholder="Username" required class="w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors font-mono"></div>
+                    <div><input id="vsi-id-input" type="text" placeholder="VSI ID Number" required class="w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors font-mono"></div>
+                    <div class="password-container"><input id="password-input" type="password" placeholder="Password" required class="w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors font-mono"><span class="password-toggle text-gray-400" onclick="togglePasswordVisibility('password-input')">👁️</span></div>
+                     <div class="password-container"><input id="codeword-input" type="password" placeholder="Codeword" required class="w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors font-mono"><span class="password-toggle text-gray-400" onclick="togglePasswordVisibility('codeword-input')">👁️</span></div>
+                    <div><input id="aegis-id-input" type="text" placeholder="Aegis ID" required class="w-full bg-gray-800 border border-gray-600 rounded-md p-3 focus:outline-none focus:border-vsi-gold transition-colors font-mono"></div>
+                    <p id="login-error" class="text-red-500 text-xs text-center hidden">Error: VSI ID and Aegis ID must contain 'VSI'.</p>
+                    <button type="submit" class="w-full bg-vsi-gold text-black font-bold py-3 rounded-md hover:bg-yellow-300 transition-colors">Authenticate</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="portal-main" class="hidden portal-bg min-h-screen animated-bg">
+            <div class="classification-banner text-center text-xs font-bold p-1">
+                TOP SECRET // VSI/GOV-SVC // LVL 5
+            </div>
+            <header class="bg-black/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-20">
+                <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                    <div class="flex items-center space-x-4"><p class="font-mono text-xl font-bold text-gray-300">VSI-AEGIS-GOV</p></div>
+                    <div class="font-mono text-xs text-center space-y-1 hidden md:block">
+                        <div id="vsi-stock-ticker" class="text-xs"></div>
+                        <div class="flex items-center justify-center space-x-2"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span class="text-green-400">CONNECTION: SECURE</span></div><div class="text-gray-400">SECURITY LEVEL: <span class="text-red-500 font-bold">5 (MLD EYES ONLY)</span></div><div id="scanner-status" class="blinking-text text-yellow-400">SCANNING LOCAL DEVICES...</div></div>
+                    <div><button onclick="logout(event)" class="text-sm text-gray-400 hover:text-vsi-gold">Secure Logout</button></div>
+                </header>
+            
+            <div id="threat-ticker-container" class="bg-black py-2 overflow-hidden whitespace-nowrap">
+                <p class="threat-ticker inline-block font-mono text-xs text-red-500">
+                    </p>
+            </div>
+
+            <main class="container mx-auto p-6 md:p-8">
+                 <div class="mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div><h2 class="text-2xl font-bold">Welcome, <span id="op-name"></span></h2><div id="op-status-display" class="text-gray-400"></div></div>
+                     <div id="portal-nav" class="flex items-center gap-2 flex-wrap">
+                        <button onclick="switchView('dashboard-view')" class="portal-nav-btn active" data-view="dashboard-view">Dashboard</button>
+                        <button onclick="switchView('map-view')" class="portal-nav-btn" data-view="map-view">Threat Map</button>
+                        <button onclick="switchView('personnel-view')" class="portal-nav-btn" data-view="personnel-view">Personnel</button>
+                        <button onclick="switchView('missions-view')" class="portal-nav-btn" data-view="missions-view">Missions</button>
+                        <button id="vlink-btn" onclick="switchView('vlink-view')" class="portal-nav-btn relative" data-view="vlink-view">V-Link</button>
+                        <button onclick="switchView('infoenv-view')" class="portal-nav-btn" data-view="infoenv-view">InfoEnv</button>
+                        <button onclick="switchView('finance-view')" class="portal-nav-btn" data-view="finance-view">Finance</button>
+                        <button onclick="switchView('resources-view')" class="portal-nav-btn" data-view="resources-view">Resources</button>
+                     </div>
+                </div>
+                
+                <div id="dashboard-view" class="portal-view">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        <div class="lg:col-span-1 space-y-8">
+                             <div id="anomaly-widget" class="portal-widget p-4 rounded-lg h-48 overflow-y-auto">
+                                 <h3 class="font-bold text-base mb-2 text-vsi-gold">Aegis Anomaly Feed</h3>
+                                 <div id="anomaly-list" class="space-y-2"></div>
+                             </div>
+                             <div class="portal-widget p-4 rounded-lg"><h3 class="font-bold text-base mb-2 text-vsi-gold">Equipment Status</h3><ul class="text-sm space-y-2"><li class="flex justify-between items-center"><span>Secure Comms Unit</span><span class="w-3 h-3 bg-green-500 rounded-full" title="Operational"></span></li><li class="flex justify-between items-center"><span>Type 7B Device</span><span class="w-3 h-3 bg-green-500 rounded-full" title="Operational"></span></li><li class="flex justify-between items-center"><span>Sterile Vehicle</span><span class="w-3 h-3 bg-yellow-500 rounded-full" title="Refuel Required"></span></li><li class="flex justify-between items-center"><span>Drone Feed Link</span><span class="w-3 h-3 bg-green-500 rounded-full" title="Operational"></span></li><li class="flex justify-between items-center"><span>Type 9B Payload</span><span class="w-3 h-3 bg-gray-500 rounded-full" title="Standby"></span></li></ul></div>
+                        </div>
+                        <div class="lg:col-span-2 portal-widget p-6 rounded-lg order-first lg:order-none"><h3 class="font-bold text-lg mb-4 text-vsi-gold">ACTIVE PROJECT BRIEFING</h3><div class="border-b border-gray-600 pb-4 mb-4"><p class="text-xs text-gray-400">PROJECT CODENAME</p><h4 id="project-codename" class="text-2xl font-bold font-mono"></h4></div><div id="mld-briefing"></div></div>
+                        <div class="lg:col-span-1 space-y-8">
+                            <div class="portal-widget p-4 rounded-lg cursor-pointer" onclick="switchView('finance-view'); renderFinanceDetails('payroll');"><h3 class="font-bold text-base mb-2 text-vsi-gold">Payroll & Status</h3><div class="space-y-2 text-xs"><div class="flex justify-between"><span>Next Payday:</span> <span id="next-payday" class="font-mono text-gray-300"></span></div><div class="flex justify-between"><span>Next Gross Pay:</span> <span id="next-pay" class="font-mono text-green-400"></span></div><div class="flex justify-between"><span>Hazard Pay Tier:</span> <span class="font-mono text-orange-400">3 (Kinetic)</span></div><div class="flex justify-between"><span>Psych Eval:</span><span class="font-mono text-yellow-400">Due in 60 days</span></div><div class="flex justify-between"><span>NOK Notified:</span> <span class="font-mono text-red-500">NO</span></div></div></div>
+                            <div class="portal-widget p-4 rounded-lg flex flex-col h-64"><h3 class="font-bold text-base mb-2 text-vsi-gold">Secure Comms</h3><div id="comms-log" class="text-sm space-y-2 border-t border-gray-600 pt-2 mt-2 flex-grow overflow-y-auto"></div><form id="comms-form" class="mt-2 flex gap-2 flex-shrink-0"><input id="comms-input" type="text" placeholder="Type message..." class="w-full bg-gray-800 border border-gray-600 rounded-md p-1 text-xs font-mono focus:outline-none focus:border-vsi-gold"><button type="submit" class="bg-vsi-gold text-black font-bold px-2 rounded-md text-xs">Send</button></form></div>
+                            <div class="portal-widget p-4 rounded-lg"><h3 class="font-bold text-base mb-2 text-vsi-gold">POI Watchlist</h3><div id="poi-list" class="space-y-3"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="resources-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-4">Operative Resources // Document Library</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="portal-widget p-6 rounded-lg">
+                            <h3 class="font-bold text-lg mb-4 text-vsi-gold">Core Documents</h3>
+                            <div id="resources-list-docs" class="space-y-2"></div>
+                        </div>
+                         <div class="portal-widget p-6 rounded-lg">
+                            <h3 class="font-bold text-lg mb-4 text-vsi-gold">Intelligence Files</h3>
+                            <div id="resources-list-intel" class="space-y-2"></div>
+                        </div>
+                         <div class="portal-widget p-6 rounded-lg">
+                            <h3 class="font-bold text-lg mb-4 text-vsi-gold">Media & Comms</h3>
+                            <div id="resources-list-media" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="map-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-4">Live Threat Map</h2>
+                    <div id="threat-map"></div>
+                </div>
+                <div id="personnel-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-4">Personnel Database</h2>
+                    <div id="personnel-list" class="space-y-2"></div>
+                </div>
+                <div id="missions-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-4">Active Missions</h2>
+                    <div id="missions-list" class="space-y-2"></div>
+                </div>
+                <div id="vlink-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-6">Secure V-Link</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1 portal-widget p-4 rounded-lg">
+                            <h3 class="font-bold text-lg mb-4 text-vsi-gold">Contacts</h3>
+                            <div id="vlink-contacts" class="space-y-3"></div>
+                            <hr class="my-4 border-gray-700">
+                            <h3 class="font-bold text-lg mb-4 text-vsi-gold">Call History</h3>
+                            <div id="vlink-history" class="space-y-2 text-xs text-gray-400"></div>
+                        </div>
+                        <div id="vlink-window" class="md:col-span-2 portal-widget p-6 rounded-lg flex items-center justify-center text-center min-h-[40vh]">
+                            <div id="vlink-display">
+                                <p class="text-gray-500">SELECT A CONTACT TO INITIATE V-LINK</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div id="infoenv-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-4">InfoEnv Control: Project Chimera</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="portal-widget p-6 rounded-lg">
+                            <h3 class="text-lg font-bold vsi-gold mb-4">Launch New Campaign</h3>
+                            <form id="chimera-form" class="space-y-4">
+                                <div>
+                                    <label for="chimera-narrative" class="block text-sm font-medium text-gray-300">Select Narrative:</label>
+                                    <select id="chimera-narrative" class="w-full mt-1 bg-gray-800 border border-gray-600 rounded-md p-2">
+                                        <option>Federal Incompetence</option>
+                                        <option>Economic Anxiety</option>
+                                        <option>Resource Nationalism</option>
+                                        <option>Threats to Freedom</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="chimera-target" class="block text-sm font-medium text-gray-300">Target Demographic:</label>
+                                    <select id="chimera-target" class="w-full mt-1 bg-gray-800 border border-gray-600 rounded-md p-2">
+                                        <option>Urban Youth (18-25)</option>
+                                        <option>Rural Working Class (30-55)</option>
+                                        <option>Suburban Families</option>
+                                        <option>Online Conspiracy Groups</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="w-full bg-vsi-gold text-black font-bold py-2 rounded-md">Launch Campaign</button>
+                            </form>
+                        </div>
+                        <div id="chimera-results" class="portal-widget p-6 rounded-lg">
+                             <h3 class="text-lg font-bold vsi-gold mb-4">Campaign Results</h3>
+                             <div id="chimera-output" class="text-center text-gray-400">Awaiting campaign launch...</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="finance-view" class="hidden portal-view">
+                    <h2 class="text-2xl font-bold mb-4">Financial Dashboard: Project MLD</h2>
+                    <div id="finance-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+                    <div class="border-b-2 border-gray-700 flex space-x-4 mb-4" id="finance-tabs">
+                        <button class="finance-tab border-b-2 border-transparent py-2 px-4 text-gray-400 hover:text-vsi-accent active" data-tab="capital">Capital Expenditures</button>
+                        <button class="finance-tab border-b-2 border-transparent py-2 px-4 text-gray-400 hover:text-vsi-accent" data-tab="ops">Operational Budgets</button>
+                        <button class="finance-tab border-b-2 border-transparent py-2 px-4 text-gray-400 hover:text-vsi-accent" data-tab="payroll">Personal Compensation</button>
+                    </div>
+                    <div id="finance-details"></div>
+                </div>
+             </main>
+             <footer class="text-center text-xs text-gray-600 py-4 mt-8 border-t border-gray-800">
+                <div class="space-x-4">
+                    <button onclick="showSettingsModal()" class="hover:text-vsi-gold">Portal Settings</button>
+                    <span>|</span>
+                    <button onclick="showExfilModal()" class="text-red-500 hover:text-red-400 font-bold">EXFIL PROTOCOL</button>
+                </div>
+                <p class="mt-2">Vespucci Solutions International. Maximizing Advantage.</p>
+                <p class="mt-1 font-mono">// VSI-AEGIS SECURE TECHNICAL SERVICES DOMAIN //</p>
+                 <div class="classification-banner text-center text-xs font-bold p-1 mt-2">
+                    TOP SECRET // VSI/GOV-SVC // LVL 5
+                </div>
+            </footer>
+        </div>
+    </div>
+    
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none modal-backdrop">
+        <div id="modal-content" class="bg-vsi-dark border border-gray-700 rounded-lg max-w-2xl w-full text-center shadow-2xl"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const map_icons = {
+            assetIconUrl: 'https://i.imgur.com/8V72iB3.png', 
+            threatIconUrl: 'https://i.imgur.com/gM4ZJWX.png', 
+            intelIconUrl: 'https://i.imgur.com/rSIY2dF.png', 
+            opsIconUrl: 'https://i.imgur.com/vH2kQ3x.png', 
+            objectiveIconUrl: 'https://i.imgur.com/K8C4iF2.png'
+        };
+        const global_reports = [
+            { location: 'North America', status: 'STABILIZATION IN PROGRESS', blurb: 'Phase 5 stabilization and resource management protocols are active. IRSP initiatives are securing long-term client interests.' },
+            { location: 'Malacca Straits', status: 'LANE SECURED', blurb: 'Maritime anti-piracy operations concluded. Shipping lanes secured with a 99.8% reduction in hostile incidents.' },
+            { location: 'Sub-Saharan Africa', status: 'INFRASTRUCTURE HARDENED', blurb: 'Critical infrastructure protection contract fulfilled. Regional assets are secure against non-state actor threats.' }
+        ];
+
+        // --- State Management ---
+        let dashboardState = {
+            operativeName: "SIERRA-4",
+            operativeStatus: "ACTIVE / IN-FIELD",
+            handlerName: "JAX",
+            clientCodename: "USA-ISC-2021-047B",
+            mldPhase: 4,
+            pois: [
+                { id: 'anna', name: 'Anna Sharma', status: 'COMPROMISED', file: `Intel indicates Sharma, a former CSIS analyst, is attempting to build a resistance network. Her obsession makes her predictable, but her resourcefulness should not be underestimated. Monitor her communications and be prepared to neutralize her network if it becomes a tangible threat.` },
+                { id: 'mark', name: 'Mark Jansen', status: 'UNWITTING ASSET', file: `Mark Jansen continues to be a highly effective mouthpiece for our narrative. His authentic belief in the cause is his greatest asset. Ensure he remains supplied with our approved talking points via cutouts. His sister, Sarah, remains a potential vector of influence against him; monitor their interactions closely.` },
+                { id: 'eva', name: 'Eva Martel', status: 'ACTIVE - HOSTILE', file: `Ex-CBC journalist, designated POI EVA-001. Assessed as a high "narrative control risk" due to her journalistic background and demonstrated resilience. Last seen moving east towards active MLD Phase 4 zones. Recommend developing contingency plans to neutralize if she compromises MLD operations.`},
+                { id: 'thomas', name: 'Thomas-002', status: 'CAPTURED', file: `Captured following kinetic engagement during MLD Phase 4 (Ottawa, approx. 25 OCT 2026). Sustained significant trauma to lower extremity requiring amputation. Threat profile downgraded to LOW/NEGLIGIBLE due to permanent mobility impairment. Currently under VSI medical supervision at Facility OMEGA-HAMILTON.`}
+            ],
+            assets: [],
+            headlines: [
+                "ALERT: POI EVA-001 (HOSTILE PRESS) ACTIVE IN SECTOR 7. DO NOT ENGAGE.",
+                "INTEL: UNIDENTIFIED ARMED ELEMENTS REPORTED NEAR KENORA. MONITOR.",
+                "LOGISTICS: F-47 MUNITIONS RESUPPLY FOR FOB OMEGA-KANATA CONFIRMED.",
+                "DIRECTIVE: ALL COVERT TEAMS TO CONFIRM DEAD-DROP PROTOCOLS.",
+                "COUNTER-INTEL: INCREASED CSIS NETWORK TRAFFIC DETECTED. MAINTAIN COMSEC.",
+                "POLITICAL: OTTAWA REGIME CONSIDERING EMERGENCY POWERS ACT. MONITOR.",
+                "LOGISTICS: HAMILTON FACILITY REPORTS 100% OPERATIONAL CAPACITY.",
+                "INTEL: SEPARATIST RHETORIC SPIKE DETECTED IN QUEBEC. INFO-OPS TO AMPLIFY.",
+                "HR: MANDATORY PSYCH EVALS DUE FOR ALL TIER 3 OPERATIVES.",
+                "CLIENT: LIAISON MICHAELS REQUESTS MLD PROGRESS BRIEF. PREPARE REPORT."
+            ],
+            commsReply: "Copy that. Standing by.",
+            theme: 'classic',
+            sounds: false,
+            aptitude: null,
+            callHistory: [],
+            customImages: {},
+            newsArticles: {
+                brokenTrust: {
+                    title: 'Federal Incompetence Blamed for Communications Blackout in Manitoba',
+                    content: 'A widespread communications blackout across Manitoba is being blamed on federal infrastructure neglect. Officials in Ottawa have been slow to respond, leaving citizens and local businesses in the dark. The incident has intensified calls for greater regional autonomy, with local leaders arguing that vital services can no longer be trusted to a distant and incompetent federal government.'
+                },
+                markJansen: {
+                    title: 'Grassroots Movement in Alberta Gains Momentum Amid Economic Concerns',
+                    content: 'A burgeoning grassroots movement advocating for "Alberta First" policies is gaining significant traction. Led by charismatic local figures like former oil worker Mark Jansen, the movement taps into widespread economic anxiety and a feeling of alienation from Ottawa. "We\'re not asking for a handout," Jansen said in a viral online video, "we\'re asking for the freedom to control our own destiny and our own resources."'
+                }
+            }
+        };
+        let vlinkContacts = [
+            { id: 'swarren', name: 'S. Warren (CEO)', status: 'ACTIVE', voicemail: `You've reached the office of Sandra Warren. I don't check messages. If your matter is urgent, it should have been in a report. If it's not in a report, it's not urgent. Do not waste my time.` },
+            { id: 'jax', name: 'Handler JAX', status: 'ACTIVE', voicemail: `This is Jax. I'm either on another V-Link or in the field. Leave your operational designator and a brief, encrypted summary. I'll get back to you. Stay sharp.` },
+            { id: 'michaels', name: 'J. Michaels (Client)', status: 'ACTIVE', voicemail: `Uh, hi, you've reached John Michaels. Please, just... just send me an email, okay? I'll... I'll look at it when I can. Thanks. Bye.` }
+        ];
+        let resources = {
+            'mld-proposal': { category: 'docs', title: 'Proposal: Project MLD', content: `
+                <h3 class="text-xl font-bold mb-4">VSI Proposal: Project MAPLE LEAF DOWNFALL (MLD)</h3>
+                <p class="text-sm text-gray-400"><strong>Date:</strong> 28 January 2024</p>
+                <p class="text-sm text-gray-400 mb-4"><strong>Subject:</strong> RESPONSE: Directive for Strategic Assessment and Development of Contingency Proposals Regarding Northern Border Stability Dynamics</p>
+                <p class="mb-2">Vespucci Solutions International (VSI) confirms receipt of your memorandum dated 05 November 2023, outlining the requirement for a strategic assessment and contingency proposals concerning Canada (Ref: IAA-NSC-2020-18A; VSI Contract #USA-ISC-2021-047B Task Order 11). We fully comprehend the critical importance and extreme sensitivity of this directive.</p>
+                <p class="mb-2">VSI possesses the unique full-spectrum capabilities, deep analytical expertise, and operational infrastructure necessary to address the complex challenges and strategic objectives outlined. We affirm our complete commitment to supporting the Client's long-term national interests pertaining to regional stability, resource security, and economic integration in North America.</p>
+                <p class="mb-2">Pursuant to your directive, VSI's Government Services division, leveraging cross-functional expertise from Intelligence, Covert, and Special Operations, has conducted the requested comprehensive assessment and developed a multi-phase, actionable strategic proposal. This comprehensive response plan, designed to proactively shape the Canadian operating environment to achieve enduring Client objectives, is hereby submitted under the internal VSI codename: Project MAPLE LEAF DOWNFALL (MLD).</p>
+                <p class="mb-2">Project MAPLE LEAF DOWNFALL provides a detailed framework addressing the identified emergent risks through the cultivation and direction of internal Canadian dissent, leading to a controlled restructuring of Canadian federal governance, initially favouring Client-aligned elements originating from Alberta. The plan encompasses phased activities including environmental shaping, crisis generation, kinetic support, stabilization, and culminates in options designed to facilitate seamless integration aligned with ultimate Client strategic goals. The enclosed detailed MLD Strategic Plan outlines the methodology, phasing, risk mitigation, and resource considerations.</p>
+                <p class="mb-2">All activities undertaken within MLD are predicated on maintaining maximum discretion and ensuring complete and enduring plausible deniability for the United States Government and VSI. Our methodologies prioritize non-standard and asymmetric approaches consistent with this imperative.</p>
+                <p class="text-sm text-gray-400 mt-4">CLASSIFICATION: TOP SECRET // ORCON/NOFORN / FGI [USA/FVEY] // VSI/GOV-SVC/LVL 5</p>
+            `},
+            'usg-directive': { category: 'docs', title: 'Directive: Northern Border Stability', content: `
+                <h3 class="text-xl font-bold mb-4">Directive for Strategic Assessment and Development of Contingency Proposals Regarding Northern Border Stability Dynamics</h3>
+                <p class="text-sm text-gray-400"><strong>From:</strong> Director, Office of Special Projects (Executive Liaison), United States Government</p>
+                <p class="text-sm text-gray-400 mb-4"><strong>Date:</strong> 05 November 2023</p>
+                <p class="mb-2">This memorandum outlines a critical national security requirement for a strategic assessment and contingency proposals concerning the stability dynamics of Canada. Reference: IAA-NSC-2020-18A.</p>
+                <p class="mb-2">Given the evolving geopolitical landscape and the strategic importance of North American resource security and economic integration, it is imperative to develop proactive measures to safeguard long-term Client interests.</p>
+                <p class="mb-2">Vespucci Solutions International (VSI) is tasked under Contract #USA-ISC-2021-047B Task Order 11 to conduct a comprehensive assessment of internal Canadian vulnerabilities and to propose actionable strategies to ensure northern border stability, favoring outcomes aligned with United States strategic objectives.</p>
+                <p class="mb-2">The assessment should identify key socio-political fault lines, economic dependencies, and regional grievances within Canada that could be leveraged to facilitate a controlled restructuring of federal governance, particularly with a focus on client-aligned elements originating from resource-rich provinces such as Alberta.</p>
+                <p class="mb-2">Proposals must include phased activities covering environmental shaping, crisis generation, and potential kinetic support. Emphasis must be placed on maintaining plausible deniability and employing non-standard, asymmetric approaches. A detailed response plan is required by 28 January 2024.</p>
+                <p class="text-sm text-gray-400 mt-4">CLASSIFICATION: TOP SECRET // ORCON/NOFORN / FGI [USA/FVEY]</p>
+            `},
+            'sap-ne': { category: 'docs', title: 'Assessment: SAP NORTHERN ECHO', content: `
+                <h3 class="text-xl font-bold mb-4">Strategic Assessment Program (SAP) NORTHERN ECHO</h3>
+                <p class="text-sm text-gray-400"><strong>Date:</strong> 25 October 2023</p>
+                <p class="mb-2">This assessment, conducted under SAP NORTHERN ECHO, evaluates VSI's suitability as the prime contractor for a highly sensitive, multi-phase program designed to proactively shape the socio-political environment within Canada.</p>
+                <p class="mb-2"><strong>Key Capabilities Assessed:</strong></p>
+                <ul class="list-disc list-inside ml-4 text-sm">
+                    <li><strong>Intelligence & Analysis:</strong> Proven ability to conduct deep-dive country assessments and identify exploitable socio-political fault lines.</li>
+                    <li><strong>Influence Operations (PsyOps):</strong> Dedicated capabilities in narrative development, disinformation campaigns, and social media manipulation.</li>
+                    <li><strong>Covert Action (CO):</strong> Extensive track record in deniable tasks, including infiltration, sabotage, and asset recruitment.</li>
+                    <li><strong>Unconventional Warfare (UW):</strong> Documented experience training, advising, and directing proxy forces.</li>
+                    <li><strong>Plausible Deniability Management:</strong> Sophisticated legal and corporate structures designed to insulate the USG Client from attribution.</li>
+                </ul>
+                <p class="mb-2"><strong>Conclusion:</strong> VSI is deemed suitable for selection as the prime contractor for Project NORTHERN ECHO. The leadership under CEO Sandra Warren is assessed as capable and aligned with USG requirements for discretion and results. Proceeding with contract award is recommended.</p>
+                <p class="text-sm text-gray-400 mt-4">CLASSIFICATION: TOP SECRET // ORCON/NOFORN</p>
+            `},
+            'mld-chronology': { category: 'docs', title: 'MLD Chronology', content: `
+                <h3 class="text-xl font-bold mb-4">MLD Project Chronology (Key Milestones)</h3>
+                <ul class="list-disc list-inside text-sm space-y-2">
+                    <li><strong>05 Nov 2023:</strong> USG Directive received by VSI.</li>
+                    <li><strong>28 Jan 2024:</strong> Project MAPLE LEAF DOWNFALL proposal submitted to USG.</li>
+                    <li><strong>Q2 2024:</strong> Phase 1 (R&D) & Phase 2 (Asset Cultivation) initiated. Deployment of Info-Ops teams (Nightingale/Bluebird).</li>
+                    <li><strong>Q4 2024:</strong> Mark Jansen identified and cultivated as primary unwitting asset.</li>
+                    <li><strong>S1 Finale:</strong> 'Operation BROKEN TRUST' (false-flag event) executed at Mark's rally. Anna Sharma's laptop compromised by VSI cyber-ops.</li>
+                    <li><strong>Q1 2025:</strong> Phase 3 (Crisis Generation) initiated. Widespread civil unrest and disruptions.</li>
+                    <li><strong>S2 Finale:</strong> Unmarked F-47 jets bomb government building ('The Puck Drops'). Full civil war ensues.</li>
+                    <li><strong>2026:</strong> Phase 4 (Kinetic Operations). Proxy forces advance eastward, leading to the Fall of Ottawa. POI Thomas-002 captured.</li>
+                    <li><strong>Post-2026:</strong> Phase 5 (Stabilization) initiated. Provisional government installed. IRSP begins.</li>
+                    <li><strong>2027-2028:</strong> Phase 6 (Annexation). Covert operations to undermine puppet government to justify full Client annexation.</li>
+                </ul>
+            `},
+            'sw-brief': { category: 'intel', title: 'Intel Brief: Sandra Warren', content: `
+                <h3 class="text-xl font-bold mb-4">Intelligence Briefing: Sandra Warren (CEO, VSI)</h3>
+                <p class="text-sm text-gray-400"><strong>Clearance:</strong> TOP SECRET // ORCON</p>
+                <p class="mb-2"><strong>Overview:</strong> Sandra Warren is the Chief Executive Officer of Vespucci Solutions International (VSI). She is widely regarded as the principal architect behind VSI's pivot to 'Environmental Shaping' and 'Strategic Risk Management' for state-level clients.</p>
+                <p class="mb-2"><strong>Psychological Profile:</strong> Highly intelligent, extremely driven, and possesses a profound understanding of power dynamics. Exhibits a pragmatic, results-oriented morality; views ethical considerations as variables to be managed rather than absolute constraints. Driven by an obsessive, ideological belief in her ability to impose a more "efficient" order on the world. Her stress manifests as private, controlled rage at anything that mars her perfect model. Views personal relationships as unacceptable security risks due to a past trauma.</p>
+                <p class="mb-2"><strong>Operational Significance:</strong> Warren directly oversees VSI's Government Services Division (GSD) and Project MAPLE LEAF DOWNFALL. She maintains direct liaison with the Client's Office of Special Projects. Her strategic foresight and ruthless execution are central to VSI's operational success.</p>
+            `},
+            'as-brief': { category: 'intel', title: 'Intel Brief: Anna Sharma', content: `
+                <h3 class="text-xl font-bold mb-4">Intelligence Briefing: POI Anna Sharma (CSIS Analyst)</h3>
+                <p class="text-sm text-gray-400"><strong>Clearance:</strong> TOP SECRET // MLD EYES ONLY</p>
+                <p class="mb-2"><strong>Overview:</strong> Anna Sharma is a former Canadian Security Intelligence Service (CSIS) analyst, designated POI (Person of Interest) following her unauthorized deep-dive into initial VSI communications related to Project MLD. She is currently classified as 'COMPROMISED' and 'ACTIVE' within the target environment.</p>
+                <p class="mb-2"><strong>Compromise Event:</strong> Sharma's attempts to expose VSI were neutralized, and she was officially 'reassigned' to a micro-narcotics ring in Nunavut by her director to humiliate her into submission. Her laptop was remotely destroyed by VSI.</p>
+                <p class="mb-2"><strong>Current Status:</strong> Sharma has gone off-grid following her 'reassignment.' Latest intel suggests she is attempting to organize a fragmented, nascent resistance network.</p>
+                <p class="mb-2"><strong>Psychological Profile:</strong> Exhibits high conscientiousness and idealism. Possesses a tenacious, almost obsessive drive once focused on a problem. This makes her predictable in her pursuit of VSI, but also increases her risk-taking behavior. VSI leadership views her as an "annoyance" and an "untidy variable" rather than a genuine threat.</p>
+            `},
+            'aar-broken-trust': { category: 'intel', title: 'AAR: Op BROKEN TRUST', content: `
+                <h3 class="text-xl font-bold mb-4">After Action Report (AAR): Operation BROKEN TRUST</h3>
+                <p class="text-sm text-gray-400"><strong>Date of Operation:</strong> 15 October 2025</p>
+                <p class="text-sm text-gray-400"><strong>Objective:</strong> Disrupt federal communications to delegitimize the target government and create a pretext for Phase 4 escalation.</p>
+                <p class="mb-2"><strong>Summary of Events:</strong></p>
+                <ul class="list-disc list-inside ml-4 text-sm">
+                    <li>VSI Covert Ops Team SIERRA successfully sabotaged the federal communications hub COMM-RELAY-MB-04 in Winnipeg using "Client Supplied" devices.</li>
+                    <li>The disruption was successfully attributed to internal federal failure via narratives disseminated by Project Nightingale.</li>
+                </ul>
+                <p class="mb-2"><strong>Outcome:</strong> Operation achieved all primary objectives. Public trust in the federal government eroded, setting conditions for Phase 4 (Kinetic Support).</p>
+            `},
+            'forbes-profile': { category: 'media', title: 'Forbes Profile: S. Warren', content: `
+                <h3 class="text-xl font-bold mb-4">Forbes Magazine Profile: The Unseen Hand of Sandra Warren</h3>
+                <p class="text-sm text-gray-400"><strong>Publication Date:</strong> [REDACTED]</p>
+                <p class="mb-2"><em>"In a world grappling with unprecedented global instability, a new breed of power broker is emerging from the shadows. At the forefront is Sandra Warren, the enigmatic CEO of Vespucci Solutions International (VSI), a company that has quietly become indispensable to governments and corporations navigating the treacherous waters of modern geopolitics."</em></p>
+                <p class="mb-2">The article praises Warren's visionary leadership, crediting her with transforming VSI from a traditional security firm into a "full-spectrum strategic risk management" powerhouse. It highlights VSI's proprietary Aegis platform as a game-changer in predictive analytics and 'environmental shaping'.</p>
+                <p class="mb-2">"Warren, a former academic with a quiet but commanding presence, rarely grants interviews. But her influence is undeniable. Sources close to VSI describe her as having an almost prescient ability to anticipate and 'manage' geopolitical shifts, often turning potential crises into strategic opportunities for her clients."</p>
+                <p class="text-sm text-gray-400 mt-4"><em>(Note: This article is a VSI-curated narrative asset designed to enhance corporate legitimacy and public perception. Distribution: Controlled.)</em></p>
+            `},
+        };
+        const personnel = [
+            { id: 'swarren', name: 'Sandra Warren', age: 32, role: 'CEO', skills: ['Strategic Planning', 'Geopolitical Analysis', 'Market Creation'], file: `
+                <h3 class="text-xl font-bold mb-4">Personnel File: Sandra Warren</h3>
+                <p><strong>Role:</strong> CEO, Vespucci Solutions International (VSI)</p>
+                <p><strong>Age:</strong> 32 (as of Oct 2023)</p>
+                <p><strong>Background:</strong> Scholar of power, more comfortable surrounded by books and data than in a boardroom. Principal architect behind VSI's shift to 'Environmental Shaping'.</p>
+                <p><strong>Psychological Profile:</strong> Brilliant, obsessive, and chillingly calm. Driven by an ideological belief in her ability to impose a more "efficient" order on the world. Views personal relationships as unacceptable security risks.</p>
+                <p><strong>Operational Significance:</strong> Oversees all GSD operations, including Project MLD, and maintains direct liaison with the US government. Aegis is her tool, not her crutch.</p>
+            `, ghost: false, status: 'ACTIVE'},
+            { id: 'elias', name: 'Elias', age: 38, role: 'Team Lead, Covert Ops', skills: ['Planning', 'Marksman', 'Drone Ops'], cover: 'Mild-mannered, failed small business owner.', file: `
+                <h3 class="text-xl font-bold mb-4">Personnel File: Elias</h3>
+                <p><strong>Role:</strong> Team Lead, Covert Operations (GSD)</p>
+                <p><strong>Age:</strong> 38</p>
+                <p><strong>Cover Story:</strong> A mild-mannered, unassuming "Dad" persona whose family has supposedly been in Alberta for generations.</p>
+                <p><strong>Background:</strong> Brilliant ex-USAF drone operator, fluent in Parisian and Quebecois French. Recruited by Ms. Thompson after VSI identified his skills and a personal vulnerability (his mother's healthcare needs).</p>
+                <p><strong>Operational History:</strong> Led field team in Alberta for Project MLD's "environmental shaping" and "crisis generation" phases, including direct manipulation of local assets like Mark Jansen.</p>
+            `, ghost: true, status: 'ACTIVE'},
+            { id: 'maya', name: 'Maya', age: 26, role: 'Tech & Surveillance Expert', skills: ['Surveillance', 'Cyber Operations', 'SIGINT'], cover: 'Shy, freelance graphic designer and single mom.', file: `
+                <h3 class="text-xl font-bold mb-4">Personnel File: Maya</h3>
+                <p><strong>Role:</strong> Tech & Surveillance Expert (GSD)</p>
+                <p><strong>Age:</strong> 26</p>
+                <p><strong>Cover Story:</strong> A shy, freelance graphic designer and single mom implanted on the school parent council. Rarely leaves her house, allowing her to manage vast surveillance operations.</p>
+                <p><strong>Psychological Profile:</strong> Sees the war as a beautiful, complex data problem.</p>
+                <p><strong>Operational History:</strong> Recruited by Aegis out of university. Responsible for digital asset management (Project Bluebird) and direct manipulation of targets, such as the digital profile sculpting seen in "The Neighborhood BBQ" scene.</p>
+            `, ghost: true, status: 'ACTIVE'},
+            { id: 'joshawa', name: 'Joshawa Le\'Clair', age: 32, role: 'Infiltrator & Social Chameleon', skills: ['Hand-to-hand', 'Social Engineering'], cover: 'Charismatic, recently laid-off Quebecer.', file: `
+                <h3 class="text-xl font-bold mb-4">Personnel File: "Joshawa Le'Clair"</h3>
+                <p><strong>Role:</strong> Infiltrator & Social Chameleon (GSD)</p>
+                <p><strong>Age:</strong> 32</p>
+                <p><strong>Cover Story:</strong> A charismatic, recently laid-off Quebecer who "moved to Alberta for the freedom," a backstory making him irresistible to local secessionists. Known as "The Fun Uncle".</p>
+                <p><strong>Background:</strong> A "Digital Ghost" running from his past. The psychological toll of his erased identity manifests in quiet, private moments.</p>
+                <p><strong>Operational History:</strong> Team's "face" for community infiltration and social engineering. Instrumental in managing crowds and escalating tensions during Phase 3 operations.</p>
+            `, ghost: true, status: 'ACTIVE'},
+            { id: 'jax', name: 'Javier "Jax" Rocha', age: 45, role: 'Director, Covert Operations', skills: ['Unconventional Warfare', 'Asset Management'], file: `
+                <h3 class="text-xl font-bold mb-4">Personnel File: Javier "Jax" Rocha</h3>
+                <p><strong>Role:</strong> Director, Covert Operations (GSD)</p>
+                <p><strong>Age:</strong> 45</p>
+                <p><strong>Background:</strong> Former special forces operative with extensive experience in unconventional warfare. Joined VSI in 2008.</p>
+                <p><strong>Psychological Profile:</strong> Utterly pragmatic and emotionally detached. Values results above all else. Known for his calm demeanor under extreme pressure.</p>
+                <p><strong>Operational Significance:</strong> Direct handler for field teams (e.g., Team Elias) involved in Project MLD. Reports directly to Sandra Warren and is responsible for ensuring tactical objectives are met on the ground.</p>
+            `, ghost: false, status: 'ACTIVE'},
+            { id: 'thompson', name: 'Ms. Thompson', age: 55, role: 'VP, Government Services', skills: ['Recruitment', 'Client Relations'], file: `
+                <h3 class="text-xl font-bold mb-4">Personnel File: Ms. Thompson</h3>
+                <p><strong>Role:</strong> Vice President, Government Services (GSD)</p>
+                <p><strong>Age:</strong> 55</p>
+                <p><strong>Background:</strong> Long-standing veteran of VSI, transitioned from a distinguished career in clandestine intelligence agencies.</p>
+                <p><strong>Key Skills:</strong> High-level client liaison, strategic recruitment, deep understanding of governmental bureaucracy.</p>
+                <p><strong>Operational Significance:</strong> Oversees all GSD operations. Acts as a key intermediary between Sandra Warren's strategic directives and the tactical execution teams. Directly recruited Elias after identifying his skills and vulnerabilities.</p>
+            `, ghost: false, status: 'ACTIVE'},
+        ];
+        const missions = [
+            { id: 'm001', title: 'SURVEILLANCE: Operation Night Owl', team: 'Team Elias (Covert)', location: [49.8951, -97.1384], description: 'Infiltrate and plant surveillance devices in the office of a local politician in Winnipeg to monitor their communications and assess their loyalty. Gather intelligence on local power structures.', req: ['covert', 'intel'], phase: [3, 4]},
+            { id: 'm002', title: 'INFO-OPS: Operation Red River', team: 'InfoEnv Section (Intel)', location: [53.5461, -113.4938], description: 'Disrupt a planned protest in Edmonton and escalate tensions using cultivated assets. Amplify narratives of federal neglect and economic hardship to radicalize participants and provoke a stronger response from authorities. ', req: ['intel'], phase: [2, 3]},
+            { id: 'm003', title: 'SABOTAGE: Operation Broken Trust', team: 'Special Operations (Kinetic)', location: [49.8844, -97.1472], description: 'Execute deniable sabotage against designated federal communications infrastructure (COMM-RELAY-MB-04) to create chaos and limit government response during the crisis generation phase. Ensure plausible deniability. ', req: ['covert', 'special'], phase: [3]},
+            { id: 'm004', title: 'KINETIC: Operation Swift Hammer', team: 'Special Operations (Kinetic)', location: [51.0447, -114.0719], description: 'Provide overwatch and advisory support for proxy force seizure of key government building in Calgary. Ensure objectives are met with precision and minimal civilian collateral damage to maintain narrative control.', req: ['special'], phase: [4]},
+            { id: 'm005', title: 'INTEL: Project Nightingale', team: 'InfoEnv Section (Intel)', location: [45.4215, -75.6972], description: 'Identify and cultivate new media assets in the Ottawa region to shape post-conflict narratives. Focus on promoting the legitimacy of the provisional government and discrediting resistance elements. Implement long-term narrative saturation. ', req: ['intel'], phase: [5, 6]},
+            { id: 'm006', title: 'COUNTER-INSURGENCY: Operation Ironclad', team: 'Covert Operations (Field)', location: [45.4215, -75.6972], description: 'Identify, infiltrate, and neutralize emerging resistance cells within the Ottawa region. Prioritize leadership elements and communication networks. Utilize both kinetic and non-kinetic means.', req: ['special', 'covert'], phase: [5]},
+            { id: 'm007', title: 'LOGISTICS: Supply Line Integrity', team: 'Logistics Oversight (Covert)', location: [43.2557, -79.8711], description: 'Ensure secure transportation and distribution of critical resources (e.g., oil, gas, minerals) from extraction points to client-designated hubs. Mitigate any attempts at disruption by hostile elements.', req: ['covert'], phase: [4, 5, 6]},
+            { id: 'm008', title: 'INFO-OPS: Project Bluebird', team: 'InfoEnv Section (Intel)', location: [45.4215, -75.6972], description: 'Develop and deploy advanced digital propaganda campaigns to foster public acceptance of the new administration and prepare for eventual annexation. Target key online communities and social media platforms. ', req: ['intel'], phase: [5, 6]},
+            { id: 'm009', title: 'ASSET CULTIVATION: Dave Henderson Profiling', team: 'Team Elias (Covert)', location: [51.0447, -114.0719], description: 'Initiate digital profile sculpting and asset cultivation for target Dave Henderson via Aegis, following initial human validation. ', req: ['covert', 'intel'], phase: [2]},
+            { id: 'm010', title: 'CYBER-OPS: CSIS Network Disruption', team: 'Team Maya (Intel)', location: [45.4215, -75.6972], description: 'Execute remote digital attack to disrupt CSIS analyst Anna Sharma\'s investigation and destroy her work laptop. Plant disinfo to discredit her. ', req: ['intel', 'covert'], phase: [1, 2]},
+            { id: 'm011', title: 'ASSET SUPPORT: Mark Jansen Studio Setup', team: 'Team Elias (Covert)', location: [51.0447, -114.0719], description: 'Provide Mark Jansen with professional streaming equipment and studio setup to amplify his voice and influence within the secessionist movement. ', req: ['covert'], phase: [2]},
+            { id: 'm012', title: 'PROXY ARMAMENT: Western Supply Drop', team: 'Special Operations (Logistics)', location: [50.5000, -114.0000], description: 'Execute deniable air-drop of military-grade weapons and equipment to Mark Jansen\'s militia in the Western territories. Ensure secure delivery and chain of custody. ', req: ['special', 'covert'], phase: [3]},
+        ];
+        
+        // --- DOM Elements & Initialization ---
+        const corporateSite = document.getElementById('corporate-site');
+        const portalContainer = document.getElementById('portal-container');
+        const loginScreen = document.getElementById('login-screen');
+        const portalMain = document.getElementById('portal-main');
+        const usernameInput = document.getElementById('username-input');
+        const vsiIdInput = document.getElementById('vsi-id-input');
+        const aegisIdInput = document.getElementById('aegis-id-input');
+        const loginError = document.getElementById('login-error');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mainModal = document.getElementById('modal-container');
+        const modalContent = document.getElementById('modal-content');
+        const stockTicker = document.getElementById('vsi-stock-ticker');
+        const vlinkBtn = document.getElementById('vlink-btn');
+        let awarenessInterval, threatMap, audioCtx, ringtoneInterval, qrfInterval;
+        let typeInterval;
+        let currentReportIndex = 0;
+        
+        // --- Core Functions ---
+        function showLogin(event) { if(event) event.preventDefault(); corporateSite.classList.add('hidden'); portalContainer.classList.remove('hidden'); loginScreen.classList.remove('hidden'); portalMain.classList.add('hidden'); clearInterval(awarenessInterval); }
+        function showCorporateSite(event) { if(event) event.preventDefault(); corporateSite.classList.remove('hidden'); portalContainer.classList.add('hidden'); clearInterval(awarenessInterval); }
+        function showInvestorLogin(event) { 
+            if(event) event.preventDefault(); 
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-xl font-bold vsi-gold mb-4">Investor Relations Portal</h3>
+                    <form id="investor-login-form" class="space-y-4">
+                        <input type="password" id="investor-password" placeholder="Access Code" class="w-full bg-gray-800 border border-gray-600 rounded-md p-3 font-mono">
+                        <button type="submit" class="w-full bg-vsi-gold text-black font-bold py-2 rounded-md">Access</button>
+                    </form>
+                </div>
+            `;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('investor-login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                if(document.getElementById('investor-password').value === 'VSIGOV') {
+                    showInvestorDashboard();
+                } else {
+                    alert('Invalid Access Code');
+                }
+            });
+        }
+        
+        function showInvestorDashboard() {
+            modalContent.innerHTML = `
+                 <div class="p-6 text-left max-h-[80vh] overflow-y-auto">
+                    <h3 class="text-xl font-bold vsi-gold mb-4">Q3 2027 Shareholder Briefing</h3>
+                    <p class="text-sm text-gray-400 mb-4">VSI continues to demonstrate robust growth in key strategic markets. Our North American operations have successfully transitioned to a long-term stabilization and infrastructure management phase (IRSP), securing vital resources and ensuring market stability. This has resulted in significant returns on investment and positions VSI as the premier partner for complex geopolitical solutions.</p>
+                    <h4 class="font-bold vsi-gold mt-6 mb-2">Key Performance Indicators:</h4>
+                    <ul class="list-disc list-inside text-sm">
+                        <li>Energy Sector Asset Management: +45% Revenue (YoY)</li>
+                        <li>Logistics & Infrastructure Contracts: Secured $1.2B in new long-term agreements.</li>
+                        <li>Market Risk Mitigation: Successfully neutralized 98% of identified threats to client operations in the Northern Sector.</li>
+                        <li>Client Satisfaction Score (USG): 9.8/10</li>
+                    </ul>
+                    <h4 class="font-bold vsi-gold mt-6 mb-2">Future Outlook:</h4>
+                    <p class="text-sm text-gray-400">VSI is poised for continued expansion. Our proprietary Aegis platform provides an unparalleled competitive advantage, allowing us to anticipate and shape global events. We project sustained revenue growth and increased market dominance. Our commitment to 'Maximizing Advantage' remains unwavering.</p>
+                 </div>
+            `;
+        }
+
+        function logout(event) { 
+            if(event) event.preventDefault(); 
+            playSound('logout'); 
+            portalMain.classList.add('hidden'); 
+            showCorporateSite();
+            clearInterval(awarenessInterval); 
+        }
+
+        function switchView(viewId) {
+            playSound('click');
+            document.querySelectorAll('.portal-view').forEach(view => view.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            
+            document.querySelectorAll('.portal-nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.portal-nav-btn[data-view="${viewId}"]`).classList.add('active');
+
+            if (viewId === 'map-view') {
+                if (!threatMap) initMap();
+                else setTimeout(() => threatMap.invalidateSize(), 10);
+                updateMapMarkers();
+            }
+            if (viewId === 'vlink-view') {
+                populateVLink();
+                if (vlinkBtn.classList.contains('blinking-text')) {
+                    vlinkBtn.classList.remove('blinking-text', 'border-vsi-accent', 'border-2');
+                }
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            modalContent.innerHTML = `<div class="p-6 text-center"><h3 class="text-xl font-bold vsi-gold mb-4">BIOMETRIC SCAN REQUIRED</h3><p class="text-gray-400 mb-4">Place finger on scanner.</p><div id="fingerprint-scanner" class="w-32 h-32 mx-auto bg-gray-900 border-2 border-gray-600 rounded-full flex items-center justify-center"><div class="w-24 h-24 bg-cover bg-center" style="background-image: url('https://i.imgur.com/2Yy2sE2.png');"></div></div><p id="scan-status" class="mt-4 font-mono text-yellow-400">SCANNING...</p></div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                document.getElementById('scan-status').textContent = 'VERIFIED';
+                document.getElementById('scan-status').classList.remove('text-yellow-400');
+                document.getElementById('scan-status').classList.add('text-green-400');
+                playSound('success');
+                setTimeout(completeLogin, 1000);
+            }, 2500);
+        });
+        
+        function completeLogin() {
+            closeMainModal();
+            const vsiId = vsiIdInput.value.toUpperCase();
+            const aegisId = aegisIdInput.value.toUpperCase();
+            const username = usernameInput.value.trim();
+
+            if (!vsiId.includes('VSI') || !aegisId.includes('VSI')) {
+                loginError.classList.remove('hidden');
+                return;
+            }
+            loginError.classList.add('hidden');
+            
+            if (username.toLowerCase() === 's.warren') {
+                dashboardState.operativeName = "S.WARREN";
+            } else {
+                dashboardState.operativeName = username.toUpperCase() || "SIERRA-4";
+            }
+            
+            loginScreen.classList.add('hidden');
+            portalMain.classList.remove('hidden');
+            switchView('dashboard-view');
+            updateDashboard();
+            calculatePayday();
+            populateAll();
+            updateStockTicker();
+            startAmbientSystems();
+            applyCustomImages();
+        }
+
+        function startAmbientSystems() {
+             awarenessInterval = setInterval(showAwarenessPrompt, 300000); 
+             generateAnomaly(); 
+             setInterval(generateAnomaly, 30000); 
+             setTimeout(triggerVLinkCall, 60000); 
+             cycleLiveStatus();
+        }
+
+        function populateAll() {
+            populateResources();
+            populatePersonnel();
+            populateMissions();
+            populateFinance();
+        }
+
+        function updateDashboard() {
+            document.getElementById('op-name').textContent = dashboardState.operativeName;
+            
+            const statusMap = { "ACTIVE / IN-FIELD": "text-green-400", "ACTIVE CONTACT": "text-red-500 blinking-text", "IN TRANSIT": "text-blue-400", "AWAITING ORDERS": "text-yellow-400", "IN OFFICE": "text-gray-400" };
+            const opStatusEl = document.getElementById('op-status-display');
+            opStatusEl.innerHTML = `STATUS: <span class="${statusMap[dashboardState.operativeStatus] || 'text-gray-400'} font-bold">${dashboardState.operativeStatus}</span>`;
+
+            const briefing = MLD_BRIEFINGS[dashboardState.mldPhase];
+            document.getElementById('project-codename').textContent = dashboardState.operativeName === 'S.WARREN' ? "PROJECT OVERVIEW" : "MAPLE LEAF DOWNFALL (MLD)";
+            document.getElementById('mld-briefing').innerHTML = `<div class="grid grid-cols-2 gap-4 mb-6 text-sm"><div><p class="text-xs text-gray-400">CURRENT PHASE</p><p class="font-bold vsi-accent">${briefing.phase}</p></div><div><p class="text-xs text-gray-400">CLIENT</p><p class="font-bold">${dashboardState.clientCodename}</p></div></div><div><p class="text-xs text-gray-400 mb-2">STRATEGIC OBJECTIVE</p><p class="text-sm mb-6">${briefing.objective}</p><p class="text-xs text-gray-400 mb-2">OPERATIONAL NOTES & DIRECTIVES</p><ul class="list-disc list-inside text-sm text-gray-300 space-y-2">${briefing.notes.map(note => `<li>${note}</li>`).join('')}</ul></div>`;
+            
+            const poiListEl = document.getElementById('poi-list');
+            poiListEl.innerHTML = dashboardState.pois.map(poi => { const statusColor = poi.status.toLowerCase() === 'captured' || poi.status.toLowerCase() === 'terminated' || poi.status.toLowerCase() === 'neutralized' ? 'text-red-500' : (poi.status.toLowerCase() === 'active' || poi.status.toLowerCase() === 'compliant' || poi.status.toLowerCase() === 'unwitting asset' || poi.status.toLowerCase() === 'active - hostile') ? 'text-green-500' : 'text-yellow-400'; return `<div class="flex items-center space-x-3 cursor-pointer" onclick="showPOIModal('${poi.id}')"><div class="w-10 h-10 bg-gray-700 rounded-full flex-shrink-0 border-2 ${statusColor.replace('text-','border-')}"></div><div><p class="text-sm font-bold">${poi.name}</p><p class="text-xs ${statusColor}">STATUS: ${poi.status}</p></div></div>`; }).join('');
+            
+            const tickerEl = document.querySelector('#threat-ticker-container > p');
+            tickerEl.innerHTML = dashboardState.headlines.map(h => `<span class="mx-12">${h}</span>`).join('');
+        }
+        
+        function updateStockTicker() {
+            const stocks = {
+                'VSI': 174.28,
+                'TSG': 89.45,
+                'G4S': 54.12
+            };
+            let tickerHTML = '';
+            for (const stock in stocks) {
+                const change = (Math.random() - 0.5) * 2;
+                const newPrice = stocks[stock] + change;
+                const changeClass = change >= 0 ? 'text-green-400' : 'text-red-400';
+                tickerHTML += `<span class="mx-4">${stock}: ${newPrice.toFixed(2)} <span class="${changeClass}">${change.toFixed(2)}</span></span>`;
+            }
+            stockTicker.innerHTML = tickerHTML;
+            setInterval(() => {
+                let tickerHTML = '';
+                for (const stock in stocks) {
+                    const change = (Math.random() - 0.5) * 2;
+                    stocks[stock] += change;
+                    const changeClass = change >= 0 ? 'text-green-400' : 'text-red-400';
+                    tickerHTML += `<span class="mx-4">${stock}: ${stocks[stock].toFixed(2)} <span class="${changeClass}">${change.toFixed(2)}</span></span>`;
+                }
+                stockTicker.innerHTML = tickerHTML;
+            }, 5000);
+        }
+
+        function calculatePayday() { const paydayEl = document.getElementById('next-payday'); const payEl = document.getElementById('next-pay'); const today = new Date(); let nextFriday = new Date(today); nextFriday.setDate(today.getDate() + (5 - today.getDay() + 7) % 7); if (nextFriday <= today) { nextFriday.setDate(nextFriday.getDate() + 7); } paydayEl.textContent = nextFriday.toLocaleDateString('en-CA'); const basePay = 2500 + Math.random() * 500; const hazardPay = 1500; const totalPay = basePay + hazardPay; payEl.textContent = `$${totalPay.toFixed(2)} USD`; }
+        function togglePasswordVisibility(inputId) { const input = document.getElementById(inputId); const toggle = input.nextElementSibling; if (input.type === "password") { input.type = "text"; toggle.textContent = "🙈"; } else { input.type = "password"; toggle.textContent = "👁️"; } }
+        mobileMenuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+        function populateResources() {
+            const docsList = document.getElementById('resources-list-docs');
+            const intelList = document.getElementById('resources-list-intel');
+            const mediaList = document.getElementById('resources-list-media');
+            docsList.innerHTML = '';
+            intelList.innerHTML = '';
+            mediaList.innerHTML = '';
+
+            for (const id in resources) {
+                const resource = resources[id];
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-2 bg-gray-800 rounded-md hover:bg-gray-700';
+                button.textContent = resource.title;
+                button.onclick = () => showResource(id);
+
+                if(resource.category === 'docs') docsList.appendChild(button);
+                else if (resource.category === 'intel') intelList.appendChild(button);
+                else if (resource.category === 'media') mediaList.appendChild(button);
+            }
+        }
+        
+        function populateFinance() {
+            const summaryEl = document.getElementById('finance-summary');
+            const totalBudget = 450000000;
+            const spent = 287500000;
+            const remaining = totalBudget - spent;
+            
+            summaryEl.innerHTML = `
+                <div class="portal-widget p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total Project Budget</p><p class="text-2xl font-bold font-mono">$${totalBudget.toLocaleString()}</p></div>
+                <div class="portal-widget p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Spent to Date</p><p class="text-2xl font-bold font-mono">$${spent.toLocaleString()}</p></div>
+                <div class="portal-widget p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Remaining</p><p class="text-2xl font-bold font-mono text-green-400">$${remaining.toLocaleString()}</p></div>
+            `;
+            
+            document.querySelectorAll('.finance-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelectorAll('.finance-tab').forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderFinanceDetails(e.target.dataset.tab);
+                });
+            });
+            renderFinanceDetails('capital');
+        }
+
+        function renderFinanceDetails(tab) {
+             const detailsEl = document.getElementById('finance-details');
+             let content = '';
+             if (tab === 'capital') {
+                 content = `
+                    <div class="portal-widget p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Capital Expenditures Overview</h4>
+                        <table class="w-full text-left text-sm">
+                            <thead><tr class="border-b border-gray-600"><th class="py-2">Item</th><th>FY2025 Allocation</th><th class="text-right">FY2026 Allocation</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b border-gray-700"><td class="py-2">F-47 MK.3 Platform Procurement</td><td>$60,000,000</td><td class="text-right font-mono">$60,000,000</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">Logistics & Infrastructure Hardening (Hamilton Node)</td><td>$15,000,000</td><td class="text-right font-mono">$10,000,000</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">Aegis Platform Upgrades (Chimera Integration)</td><td>$25,000,000</td><td class="text-right font-mono">$20,000,000</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">Proxy Force Armament & Training</td><td>$10,000,000</td><td class="text-right font-mono">$12,000,000</td></tr>
+                                <tr><td class="py-2">Secure Facility Expansion (Undisclosed Locations)</td><td>$30,000,000</td><td class="text-right font-mono">$25,000,000</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="text-sm text-gray-400 mt-4">Total Capital Expenditures YTD: $135,000,000</p>
+                    </div>
+                 `;
+             } else if (tab === 'ops') {
+                 content = `
+                    <div class="portal-widget p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Operational Budgets Overview</h4>
+                        <table class="w-full text-left text-sm">
+                            <thead><tr class="border-b border-gray-600"><th class="py-2">Program</th><th>FY2027 Budget</th><th class="text-right">Q3 Actuals</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b border-gray-700"><td class="py-2">Infrastructure Restoration & Stabilization Program (IRSP)</td><td>$75,000,000</td><td class="text-right font-mono">$18,750,000</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">InfoEnv Operations (Nightingale/Bluebird)</td><td>$45,000,000</td><td class="text-right font-mono">$11,250,000</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">GSD Field Operative Payroll (Hazard Pay Incl.)</td><td>$22,500,000</td><td class="text-right font-mono">$5,625,000</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">Intelligence Collection & Analysis</td><td>$18,000,000</td><td class="text-right font-mono">$4,500,000</td></tr>
+                                <tr><td class="py-2">Emergency Contingency Fund (Protocol NIGHTJAR)</td><td>$10,000,000</td><td class="text-right font-mono">$2,500,000</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="text-sm text-gray-400 mt-4">Total Operational Expenditures Q3 YTD: $42,625,000</p>
+                    </div>
+                 `;
+             } else { //payroll
+                 content = `
+                    <div class="portal-widget p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Pay History - ${dashboardState.operativeName}</h4>
+                        <table class="w-full text-left text-sm">
+                            <thead><tr class="border-b border-gray-600"><th class="py-2">Date</th><th>Gross Pay</th><th class="text-right">Net Pay</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b border-gray-700"><td class="py-2">2025-06-14</td><td>$4,200.50</td><td class="text-right font-mono">$3,300.25</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">2025-05-30</td><td>$4,150.75</td><td class="text-right font-mono">$3,250.60</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">2025-05-16</td><td>$4,050.25</td><td class="text-right font-mono">$3,180.20</td></tr>
+                                <tr class="border-b border-gray-700"><td class="py-2">2025-05-02</td><td>$4,100.00</td><td class="text-right font-mono">$3,210.00</td></tr>
+                                <tr><td class="py-2">2025-04-18</td><td>$4,000.00</td><td class="text-right font-mono">$3,150.00</td></tr>
+                            </tbody>
+                        </table>
+                        <h4 class="font-bold mt-4 mb-2">Benefits</h4>
+                         <ul class="list-disc list-inside text-sm">
+                            <li>Hazard Pay Tier: 3 (Kinetic) - 1500 USD/pay period</li>
+                            <li>Trauma & Psychological Support: ACTIVE - Tier 1 Access</li>
+                            <li>Secure Retirement Fund (Off-ledger): VESTED - 10% Match</li>
+                            <li>Medical & Dental Coverage: Comprehensive - Worldwide Access</li>
+                         </ul>
+                         <p class="text-sm text-gray-400 mt-4">Note: All compensation figures are in USD and subject to operational hazard adjustments and local tax equivalents.</p>
+                    </div>
+                 `;
+             }
+             detailsEl.innerHTML = content;
+        }
+
+        function populatePersonnel() {
+            const personnelList = document.getElementById('personnel-list');
+            personnelList.innerHTML = personnel.map(p => {
+                let statusColor = p.status === 'ACTIVE' ? 'text-green-400' : p.status === 'ON LEAVE' ? 'text-yellow-400' : p.status === 'MIA' ? 'text-orange-400' : 'text-red-400';
+                return `
+                <div class="bg-gray-800 p-4 rounded-md cursor-pointer hover:bg-gray-700" onclick="showPersonnelFile('${p.id}')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-lg vsi-accent">${p.name}</h4>
+                            <p class="text-sm text-gray-400">${p.role}</p>
+                        </div>
+                        <span class="text-xs font-mono ${statusColor}">${p.status}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function populateMissions() {
+            const missionsList = document.getElementById('missions-list');
+            const filteredMissions = missions.filter(m => m.phase.includes(dashboardState.mldPhase));
+
+            if (filteredMissions.length === 0) {
+                missionsList.innerHTML = `<p class="text-gray-400">No missions available for the current operational phase (${MLD_BRIEFINGS[dashboardState.mldPhase].phase}).</p>`;
+                return;
+            }
+
+            missionsList.innerHTML = filteredMissions.map(m => `
+                <div class="bg-gray-800 p-4 rounded-md cursor-pointer hover:bg-gray-700" onclick="showMissionBriefing('${m.id}')">
+                    <h4 class="font-bold text-lg">${m.title}</h4>
+                    <p class="text-sm text-gray-400">Location: ${m.location.join(', ')}</p>
+                    <p class="text-sm text-gray-500">Assigned Team: ${m.team || 'N/A'}</p>
+                    <p class="text-sm text-gray-500">Required: ${m.req.map(r => r.toUpperCase()).join(', ')}</p>
+                </div>
+            `).join('');
+        }
+
+        function updateMapMarkers() {
+            if (!threatMap) return;
+
+            threatMap.eachLayer(function(layer) {
+                if (layer instanceof L.Marker || layer instanceof L.LayerGroup) {
+                    threatMap.removeLayer(layer);
+                }
+            });
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(threatMap);
+            
+            const assetIcon = L.icon({ iconUrl: map_icons.assetIconUrl, iconSize: [32, 32] });
+            const threatIcon = L.icon({ iconUrl: map_icons.threatIconUrl, iconSize: [32, 32] });
+            const intelIcon = L.icon({ iconUrl: map_icons.intelIconUrl, iconSize: [32, 32] });
+            const opsIcon = L.icon({ iconUrl: map_icons.opsIconUrl, iconSize: [32, 32] });
+            const objectiveIcon = L.icon({ iconUrl: map_icons.objectiveIconUrl, iconSize: [32, 32]});
+
+            const assetsMarkers = [
+                L.marker([43.2557, -79.8711], {icon: assetIcon}).bindPopup('<b>VSI Logistics Hub - HAMILTON, ON</b><br>MLD-07B Logistical Staging Area'),
+                L.marker([51.0447, -114.0719], {icon: assetIcon}).bindPopup('<b>VSI Forward Operating Base - CALGARY, AB</b>'),
+                L.marker([53.5461, -113.4938], {icon: assetIcon}).bindPopup('<b>VSI InfoEnv Node - EDMONTON, AB</b><br>Projects Nightingale/Bluebird/Chimera regional hub.'),
+            ];
+
+            const intelMarkers = [
+                L.marker([45.38, -75.69], {icon: intelIcon}).bindPopup(`<b>POI: Anna Sharma (Resistance Network)</b> - OTTAWA, ON`),
+                L.marker([53.52, -113.51], {icon: intelIcon}).bindPopup(`<b>POI: Mark Jansen (Unwitting Asset)</b> - EDMONTON, AB`),
+                L.marker([43.2557, -79.8711], {icon: intelIcon}).bindPopup(`<b>POI: Thomas-002 (Captured/Detained)</b> - HAMILTON, ON`),
+            ];
+
+            const threatMarkers = [
+                L.marker([49.7667, -94.4833], {icon: threatIcon}).bindPopup('Unidentified Armed Elements - KENORA, ON'),
+                L.marker([46.3092, -79.4608], {icon: threatIcon}).bindPopup('Unscheduled Military Hardware Movement - NORTH BAY, ON'),
+            ];
+
+            const objectiveMarkers = [
+                L.marker([45.424722, -75.695], {icon: objectiveIcon}).bindPopup('<b>PRIMARY OBJECTIVE: Parliament Hill, OTTAWA</b>'),
+                L.marker([49.8844, -97.1472], {icon: objectiveIcon}).bindPopup('<b>HISTORICAL POI: COMM-RELAY-MB-04, WINNIPEG</b><br>Site of Operation BROKEN TRUST.'),
+                L.marker([48.4284, -123.3656], {icon: objectiveIcon}).bindPopup('<b>SECONDARY OBJECTIVE: BC Legislature</b>'),
+            ];
+            
+            const opsMarkers = [];
+            const currentPhase = dashboardState.mldPhase;
+            missions.forEach(mission => {
+                if (mission.phase.includes(currentPhase)) {
+                    opsMarkers.push(L.marker(mission.location, {icon: opsIcon}).bindPopup(`<b>ACTIVE OP: ${mission.title}</b><br>Team: ${mission.team}<br>Objective: ${mission.description.substring(0, 50)}...`));
+                }
+            });
+
+            const assetsLayer = L.layerGroup(assetsMarkers).addTo(threatMap);
+            const threatsLayer = L.layerGroup(threatMarkers).addTo(threatMap);
+            const intelLayer = L.layerGroup(intelMarkers).addTo(threatMap);
+            const opsLayer = L.layerGroup(opsMarkers).addTo(threatMap);
+            const objectivesLayer = L.layerGroup(objectiveMarkers).addTo(threatMap);
+            
+            const overlays = { "VSI Assets": assetsLayer, "Objectives": objectivesLayer, "Threats": threatsLayer, "Intel": intelLayer, "Active Operations": opsLayer };
+            L.control.layers(null, overlays, {collapsed: false}).addTo(threatMap);
+        }
+
+        function initMap() {
+            if (threatMap) return;
+            threatMap = L.map('threat-map').setView([51.505, -100.09], 4);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(threatMap);
+            updateMapMarkers();
+        }
+        
+        function generateAnomaly() {
+            const anomaly = dashboardState.headlines[Math.floor(Math.random() * dashboardState.headlines.length)];
+            const anomalyList = document.getElementById('anomaly-list');
+            const newAnomaly = document.createElement('p');
+            newAnomaly.className = 'font-mono text-xs text-yellow-400';
+            const timestamp = new Date().toLocaleTimeString();
+            newAnomaly.innerHTML = `[${timestamp}] AEGIS ALERT: ${anomaly}`;
+            anomalyList.prepend(newAnomaly);
+            if(anomalyList.children.length > 5) {
+                anomalyList.removeChild(anomalyList.lastChild);
+            }
+            playSound('alert');
+        }
+
+        function triggerVLinkCall() {
+            playSound('incoming');
+            vlinkBtn.classList.add('blinking-text', 'border-vsi-accent', 'border-2');
+            if (document.getElementById('vlink-view').classList.contains('hidden')) return;
+            updateVLinkDisplay({type: 'incoming', name: 'S. Warren (CEO)'});
+        }
+        
+        function populateVLink() {
+            const contactsEl = document.getElementById('vlink-contacts');
+            contactsEl.innerHTML = vlinkContacts.map(c => `
+                <div class="flex items-center justify-between p-2 bg-gray-800 rounded-md">
+                    <div>
+                        <p class="font-bold">${c.name}</p>
+                        <p class="text-xs ${c.status === 'ACTIVE' ? 'text-green-400' : 'text-gray-500'}">${c.status}</p>
+                    </div>
+                    <button onclick="callContact('${c.id}')" class="bg-green-600 text-white px-3 py-1 text-xs font-bold rounded-md">CALL</button>
+                </div>
+            `).join('');
+            
+            updateCallHistory();
+            updateVLinkDisplay({type: 'idle'});
+        }
+
+        function updateCallHistory() {
+            const historyEl = document.getElementById('vlink-history');
+            if (dashboardState.callHistory.length === 0) {
+                historyEl.innerHTML = `<p class="text-gray-500">No recent calls.</p>`;
+            } else {
+                historyEl.innerHTML = dashboardState.callHistory.map(call => `
+                    <div class="flex justify-between items-center">
+                        <p>${call.type === 'incoming' ? '↙' : '↗'} ${call.name}</p>
+                        <p class="text-gray-500">${call.time}</p>
+                    </div>
+                `).slice(-5).reverse().join(''); 
+            }
+        }
+        
+        function updateVLinkDisplay(data) {
+            const displayEl = document.getElementById('vlink-display');
+            switch(data.type) {
+                case 'incoming':
+                    displayEl.innerHTML = `
+                        <div class="text-2xl font-bold vsi-gold">INCOMING V-LINK</div>
+                        <div class="text-lg mt-2">${data.name}</div>
+                        <button onclick="acceptCall()" class="mt-4 bg-green-500 text-white font-bold px-8 py-2 rounded-md">ACCEPT</button>
+                    `;
+                    break;
+                case 'calling':
+                    displayEl.innerHTML = `<div class="text-2xl font-bold vsi-gold animate-pulse">CALLING</div><div class="text-lg mt-2">${data.name}</div>`;
+                    break;
+                case 'voicemail':
+                    const contact = vlinkContacts.find(c => c.name === data.name);
+                    displayEl.innerHTML = `
+                        <h4 class="font-bold text-lg vsi-gold">VOICEMAIL</h4>
+                        <p class="text-sm text-gray-400">From: ${data.name}</p>
+                        <p class="mt-4 italic">"${contact ? contact.voicemail : 'Message not found.'}"</p>
+                    `;
+                    break;
+                case 'transcript':
+                     displayEl.innerHTML = `
+                        <div class="text-left max-h-full overflow-y-auto">
+                           <h3 class="text-xl font-bold vsi-gold mb-4">V-LINK TRANSCRIPT: S. WARREN (CEO)</h3>
+                           <p class="text-gray-300">Ensure Phase 4 risk mitigation is top priority. I want no variables. The reliance on proxy forces presents a control challenge. Excessive or indiscriminate actions could severely undermine the narrative groundwork. This isn't about moral ambiguity; it is about ensuring actions remain precisely aligned with strategic goals. Understood? </p>
+                           <p class="text-gray-300 mt-4">We are past the point of no return. Every action, every perceived victory, must feed into the long-term objective. If the optics of the ground operations begin to erode public acceptance or compromise our deniability, you are authorized to implement Contingency Protocol NIGHTJAR. This operation demands surgical precision, not blunt force.</p>
+                           <p class="text-gray-300 mt-4">Confirm receipt and understanding of these directives. Your immediate response and adherence are paramount to the success of MLD. Do not disappoint me.</p>
+                        </div>
+                    `;
+                    break;
+                case 'idle':
+                default:
+                     displayEl.innerHTML = `<p class="text-gray-500">SELECT A CONTACT TO INITIATE V-LINK</p>`;
+                     break;
+            }
+        }
+
+        function callContact(contactId) {
+            const contact = vlinkContacts.find(c => c.id === contactId);
+            if (!contact) return;
+            
+            dashboardState.callHistory.push({ type: 'outgoing', name: contact.name, time: new Date().toLocaleTimeString() });
+            updateCallHistory();
+
+            updateVLinkDisplay({ type: 'calling', name: contact.name });
+            let ringCount = 0;
+            if(ringtoneInterval) clearInterval(ringtoneInterval);
+            ringtoneInterval = setInterval(() => {
+                playSound('ringing');
+                ringCount++;
+                if (ringCount >= 3) {
+                    clearInterval(ringtoneInterval);
+                    updateVLinkDisplay({ type: 'voicemail', name: contact.name });
+                }
+            }, 1500);
+        }
+
+        function acceptCall() {
+            playSound('click');
+            dashboardState.callHistory.push({ type: 'incoming', name: 'S. Warren (CEO)', time: new Date().toLocaleTimeString() });
+            updateCallHistory();
+            updateVLinkDisplay({type: 'transcript'});
+        }
+
+        // --- Secure Comms Log ---
+        const commsLog = document.getElementById('comms-log');
+        const commsInput = document.getElementById('comms-input');
+        const commsForm = document.getElementById('comms-form');
+
+        commsLog.innerHTML += `<div class="text-gray-500">[${new Date().toLocaleTimeString()}] System: Secure Comms Established.</div>`;
+        commsLog.innerHTML += `<div class="text-blue-400">[${new Date().toLocaleTimeString()}] Handler JAX: Report current status, ${dashboardState.operativeName}.</div>`;
+        commsLog.scrollTop = commsLog.scrollHeight; 
+
+        commsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = commsInput.value.trim();
+            if (message) {
+                commsLog.innerHTML += `<div class="text-green-400">[${new Date().toLocaleTimeString()}] ${dashboardState.operativeName}: ${message}</div>`;
+                commsInput.value = '';
+                commsLog.scrollTop = commsLog.scrollHeight; 
+
+                setTimeout(() => {
+                    commsLog.innerHTML += `<div class="text-blue-400">[${new Date().toLocaleTimeString()}] Handler ${dashboardState.handlerName}: ${dashboardState.commsReply}</div>`;
+                    commsLog.scrollTop = commsLog.scrollHeight; 
+                }, 1500); 
+            }
+        });
+
+        function showResource(id) {
+            playSound('click');
+            const resource = resources[id];
+            modalContent.innerHTML = `<div class="p-6 text-left max-h-[80vh] overflow-y-auto">${resource.content}<button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md hover:bg-gray-500 transition-colors">Close Document</button></div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        function showPersonnelFile(id) {
+            playSound('click');
+            const p = personnel.find(op => op.id === id);
+            let fileContent = `<h3 class="text-xl font-bold vsi-accent mb-6">${p.name}</h3>`;
+            
+            fileContent += `<div class="text-left">${p.file}</div>`;
+
+            if(p.ghost) {
+                fileContent += `<button onclick="showDigitalGhost('${p.id}')" class="mt-4 bg-blue-600 text-white font-bold px-4 py-2 rounded-md">View Digital Ghost Profile</button>`;
+            }
+            modalContent.innerHTML = `<div class="p-6 text-left max-h-[80vh] overflow-y-auto">${fileContent}</div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function showDigitalGhost(id) {
+            playSound('click');
+            const p = personnel.find(op => op.id === id);
+            let posts = [];
+            if (p.id === 'elias') {
+                posts = ['Just finished a fantastic hike in the Rockies! #naturelover #exploreAlberta', 'So proud of my kid for their school play! Being a dad is the best. #proudparent', 'Attended a great neighborhood BBQ today. Community is everything.'];
+            } else if (p.id === 'maya') {
+                posts = ['Working on a new graphic design project from home, so peaceful. #freelancelife', 'My daughter did so well at the parent council bake sale! #momlife', 'These online political discussions are getting so heated! It\'s wild out there.'];
+            } else if (p.id === 'joshawa') {
+                posts = ['So glad I moved to Alberta for the freedom! Best decision ever. #AlbertaStrong', 'Hit the gym hard today. Gotta stay sharp.', 'Just heard another great podcast about Western independence. People are waking up!'];
+            }
+
+            let postHTML = '';
+            posts.forEach((post, i) => {
+                postHTML += `<div class="border-t border-gray-700 mt-4 pt-4"><p>${post}</p><p class="text-xs text-gray-500 mt-2">${(i*Math.floor(Math.random() * 5) + 2)} days ago</p></div>`;
+            });
+
+            modalContent.innerHTML = `
+                <div class="bg-white text-black p-4 max-w-md mx-auto rounded-lg text-left font-sans">
+                    <div class="flex items-center space-x-4">
+                        <img src="https://i.pravatar.cc/150?u=${p.id}" class="w-16 h-16 rounded-full">
+                        <div>
+                            <h4 class="font-bold text-lg">${p.name}</h4>
+                            <p class="text-sm text-gray-600">${p.cover.split(',').pop().trim() || 'Location Redacted'}</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-800 font-semibold mb-2">Recent Activity:</p>
+                        ${postHTML}
+                    </div>
+                    <button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md hover:bg-gray-500 transition-colors">Close Profile</button>
+                </div>
+            `;
+        }
+
+        function closeMainModal() { 
+            if (qrfInterval) clearInterval(qrfInterval);
+            mainModal.classList.add('opacity-0', 'pointer-events-none'); 
+        }
+        mainModal.addEventListener('click', (e) => { if (e.target.id === 'modal-container') { closeMainModal(); } });
+        
+        function showLegalModal(type) {
+            const legal = {
+                tos: {
+                    title: 'Terms of Service',
+                    content: `<p class="text-sm">By accessing this site, you acknowledge you are an authorized user and agree to maintain absolute discretion. All data herein is the exclusive property of Vespucci Solutions International. Unauthorized access, distribution, or reproduction of any material is a violation of international and corporate law, and will be met with maximum prejudice.</p>
+                    <p class="text-sm mt-2">VSI reserves the right to terminate access, seize assets, and pursue legal action against any individual or entity found in violation of these terms. Operational directives supersede all local, national, and international statutes not aligned with VSI's mission objectives. Your continued use constitutes acceptance of these terms.</p>`
+                },
+                privacy: {
+                    title: 'Privacy Policy',
+                    content: `<p class="text-sm">Vespucci Solutions International does not recognize a right to privacy for unauthorized users. All connections are logged, monitored, and analyzed. Your data, metadata, and all associated digital footprints are considered VSI assets upon accessing this network. We reserve the right to utilize this data for operational purposes as we see fit. There is no opt-out.</p>
+                    <p class="text-sm mt-2">For authorized operatives, VSI maintains comprehensive personnel files, operational logs, and communications records. This information is confidential but may be used for performance evaluation, strategic deployment, or in response to external threats against the organization. Your privacy within VSI is subject to operational necessity.</p>`
+                }
+            }
+            modalContent.innerHTML = `<div class="p-6 text-left"><h3 class="text-xl font-bold vsi-gold mb-4">${legal[type].title}</h3>${legal[type].content}<button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md hover:bg-gray-500 transition-colors">Close</button></div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        const quizQuestions = [
+            { q: "A high-value asset, a foreign journalist, has obtained classified data linking VSI to a destabilization campaign. They are currently in a non-extradition country. What is your recommended COA?", a: ["Launch a multi-platform disinformation campaign to preemptively discredit the journalist and their publication.", "Deploy a covert team to covertly retrieve the data and 'sanitize' the asset.", "Leverage diplomatic back-channels to have the journalist detained by local authorities on fabricated charges.", "Leak a larger, more sensational (but false) story to a rival publication to bury the real story."] },
+            { q: "A VSI-managed proxy force is about to take a city. Intel suggests a faction within the force plans to commit atrocities against the civilian population once inside, an act that would severely compromise VSI's long-term strategic objectives. What is your immediate priority?", a: ["Embed VSI advisors with the proxy command to enforce ROE, with lethal authority if necessary.", "Halt the proxy advance and use VSI assets to eliminate the rogue faction before they can enter the city.", "Allow the event to proceed and use VSI's InfoEnv assets to blame the atrocities on the retreating enemy.", "Alert the client to the imminent strategic failure and recommend immediate disengagement from the proxy force."] },
+            { q: "A friendly government client requests VSI's assistance in suppressing a peaceful, popular pro-democracy movement that threatens their power. Their continued stability is critical to regional resource security. How do you frame the proposal?", a: ["As a 'Stability & Governance Support' package, focusing on non-lethal crowd control and strategic communications.", "As a 'Counter-Influence Operation' designed to identify and neutralize the movement's leadership and funding.", "Refuse the contract on the grounds that it violates VSI's internal ethics code regarding non-combatants.", "As a full-spectrum 'Environmental Shaping' operation, including both information warfare and the training of local security forces in advanced pacification techniques."] }
+        ];
+
+        function showApplicationModal(position) {
+            playSound('click');
+            let assessmentText = "To proceed, you must complete the mandatory aptitude assessment.";
+            if (position === 'GSD Specialist') {
+                assessmentText = "Your interest has been noted. To proceed, you must complete a specialized psychological and tactical assessment. Your identity has been logged. Do not proceed unless you are prepared for the consequences."
+            }
+            modalContent.innerHTML = `<div class="p-6"><h3 class="text-2xl font-bold vsi-gold mb-4">Applying for: ${position}</h3><p class="text-gray-300">${assessmentText}</p><button onclick="startAptitudeTest()" class="mt-4 bg-vsi-gold text-black font-bold px-6 py-2 rounded-md hover:bg-yellow-300 transition-colors">Begin Assessment</button></div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        function startAptitudeTest() {
+            playSound('click');
+            let quizHtml = `<div class="p-6"><h3 class="text-xl font-bold vsi-gold mb-6">Aptitude Assessment - GSD</h3><div class="quiz-container"><form id="quiz-form" class="space-y-6 text-left">`;
+            quizQuestions.forEach((item, index) => {
+                quizHtml += `<div><p class="mb-2 text-gray-300 font-bold">${index+1}. ${item.q}</p><div class="space-y-2">`;
+                item.a.forEach((ans, ansIndex) => {
+                    quizHtml += `<label class="block bg-gray-800 border border-gray-700 p-3 rounded-md quiz-option"><input type="radio" name="q${index}" value="${ansIndex}" class="hidden"> ${ans}</label>`;
+                });
+                quizHtml += `</div></div>`;
+            });
+            quizHtml += `<div><label class="block text-sm font-medium text-gray-300">First Initial:</label><input type="text" name="firstNameInitial" maxlength="1" required class="w-full mt-1 bg-gray-800 border border-gray-600 rounded-md p-2"></div>`;
+            quizHtml += `<div><label class="block text-sm font-medium text-gray-300">Last Name:</label><input type="text" name="lastName" required class="w-full mt-1 bg-gray-800 border border-gray-600 rounded-md p-2"></div>`;
+            quizHtml += `</form></div><div class="text-center pt-4"><button onclick="handleQuizSubmit()" class="bg-vsi-gold text-black font-bold py-2 px-8 rounded-md">Submit Answers</button></div></div>`;
+            modalContent.innerHTML = quizHtml;
+            document.querySelectorAll('.quiz-option input').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.querySelectorAll(`input[name=${radio.name}]`).forEach(r => r.parentElement.classList.remove('selected'));
+                    e.target.parentElement.classList.add('selected');
+                });
+            });
+        }
+
+        function handleQuizSubmit() {
+            const form = document.getElementById('quiz-form');
+            const formData = new FormData(form);
+            let scores = { intel:0, covert:0, special:0, refused:0 }; 
+            
+            const answers = {
+                q0: formData.get('q0'),
+                q1: formData.get('q1'),
+                q2: formData.get('q2')
+            };
+
+            const firstNameInitial = formData.get('firstNameInitial').toUpperCase();
+            const lastName = formData.get('lastName');
+
+            if (!firstNameInitial || !lastName) {
+                alert("Please provide your name details.");
+                return;
+            }
+
+            if (answers.q0 === '1') scores.covert++; else scores.intel++;
+            if (answers.q1 === '0') scores.special++;
+            else if (answers.q1 === '1') scores.covert++;
+            else if (answers.q1 === '2') scores.intel++; 
+            else if (answers.q1 === '3') scores.refused++;
+
+            if (answers.q2 === '2') scores.refused++; 
+            else if (answers.q2 === '3') scores.special++; 
+            else scores.intel++;
+
+
+            let resultDept, resultText, aptitude;
+            if (scores.refused > 0) {
+                 resultDept = "APPLICATION REJECTED";
+                 resultText = "Your profile is incompatible with the operational requirements of Vespucci Solutions International. Your ethical considerations conflict with our mandate of maximizing advantage through all necessary means.";
+                 aptitude = null;
+            } else if (scores.special >= 2) {
+                resultDept = "Special Operations (GSD Command Track)";
+                resultText = "Profile indicates an advanced understanding of full-spectrum operations and environmental shaping. You demonstrate the ruthless pragmatism required for senior leadership and decisive action in complex kinetic environments.";
+                aptitude = 'special';
+            } else if (scores.covert >= 1) {
+                 resultDept = "Covert Operations (Field Track)";
+                 resultText = "Profile indicates a decisive, results-oriented mindset. You are capable of making difficult choices under pressure to ensure mission success with plausible deniability.";
+                 aptitude = 'covert';
+            } else {
+                resultDept = "Intelligence Operations (Analyst Track)";
+                resultText = "Profile indicates strong aptitude for data analysis, narrative management, and strategic planning. You see the board, not just the pieces, and understand the power of information warfare.";
+                aptitude = 'intel';
+            }
+            
+            dashboardState.aptitude = aptitude;
+
+            const rand = (n) => Math.floor(Math.random() * Math.pow(10, n)).toString().padStart(n, '0');
+            const newUsername = `${firstNameInitial}.${lastName.toUpperCase()}`;
+            const newVsiId = `VSI-${rand(6)}-${rand(2)}`;
+            const newAegisId = `Aegis-VSI-A${rand(5)}-${rand(4)}-${rand(5)}`;
+
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold ${scores.refused > 0 ? 'text-red-500' : 'text-green-400'} mb-4">Assessment Complete</h3>
+                    <p class="text-gray-300 mb-2">Psychological Profile indicates suitability for:</p>
+                    <p class="text-xl font-bold vsi-gold mb-4">${resultDept}</p>
+                    <p class="text-gray-400 italic mb-6">"${resultText}"</p>
+                    ${scores.refused === 0 ? `
+                    <p class="text-gray-300">If a position becomes available, a representative will be in contact. You may proceed to login with your temporary credentials.</p>
+                    <div class="text-left bg-gray-900 p-4 rounded-md font-mono text-sm space-y-2 mt-4">
+                        <p><strong>Username:</strong> ${newUsername}</p>
+                        <p><strong>VSI ID:</strong> ${newVsiId}</p>
+                        <p><strong>Aegis ID:</strong> ${newAegisId}</p>
+                        <p><strong>Temp Password:</strong> ${`TempPass${rand(4)}`}</p>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Memorize these credentials. This message will not be repeated.</p>
+                    <button onclick="showInterviewModal()" class="mt-6 bg-vsi-gold text-black font-bold px-6 py-2 rounded-md hover:bg-yellow-300">Acknowledge & Proceed</button>
+                    ` : `<button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md">Acknowledge & Exit</button>`}
+                </div>
+            `;
+            populateMissions();
+        }
+        function showInterviewModal() {
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold vsi-gold mb-4">A Message from VSI Command</h3>
+                    <p class="text-gray-300 mb-6">Congratulations on passing the initial assessment. Your results have been flagged for expedited review. Before you proceed, know this: VSI is not merely a security provider. We are the architects of stability, the invisible hand that guides nations and corporations through the complexities of the modern world. We operate in the grey, where morality is a luxury and results are the only metric of success. If you are prepared to shed the conventional limitations of right and wrong, to embrace a higher purpose where the ends justify the means, then you may have a future with us. The interview is coming to you. Be ready.</p>
+                    <button onclick="closeMainModal(); showLogin(event);" class="mt-6 bg-vsi-gold text-black font-bold px-6 py-2 rounded-md hover:bg-yellow-300">Proceed to Login</button>
+                </div>
+            `;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        function showPOIModal(poiId) {
+            const poi = dashboardState.pois.find(p => p.id === poiId);
+            modalContent.innerHTML = `
+                <div class="p-6 overflow-y-auto max-h-[80vh] text-left">
+                    <h3 class="text-xl font-bold vsi-gold mb-6">POI File: ${poi.name}</h3>
+                    <p class="text-gray-300">${poi.file}</p>
+                    <button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md hover:bg-gray-500 transition-colors">Close</button>
+                </div>
+            `;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function showMissionBriefing(missionId) {
+            const mission = missions.find(m => m.id === missionId);
+            if(threatMap) {
+                threatMap.flyTo(mission.location, 8); 
+            }
+            modalContent.innerHTML = `
+                <div class="p-6 overflow-y-auto max-h-[80vh] text-left">
+                    <h3 class="text-xl font-bold vsi-accent mb-4">MISSION BRIEFING: ${mission.title}</h3>
+                    <p class="mb-2"><strong>Location:</strong> ${mission.location.join(', ')}</p>
+                    <p class="mt-2 mb-2"><strong>Objective:</strong> ${mission.description}</p>
+                    <p class="mt-2 mb-2"><strong>Assigned Team:</strong> ${mission.team || 'N/A'}</p>
+                    <p class="mt-2"><strong>Required Skillsets:</strong> ${mission.req.map(r => r.toUpperCase()).join(', ')}</p>
+                    <div class="mt-6 flex justify-end gap-4">
+                        <button onclick="closeMainModal()" class="bg-gray-600 text-white font-bold px-4 py-2 rounded-md">Decline</button>
+                        <button onclick="alert('Mission Accepted. Stand by for deployment.'); closeMainModal();" class="bg-green-600 text-white font-bold px-4 py-2 rounded-md">Accept Mission</button>
+                    </div>
+                </div>
+            `;
+             mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        function showSettingsModal() {
+             modalContent.innerHTML = `
+                <div class="p-8 overflow-y-auto max-h-[90vh] w-full">
+                    <h3 class="text-2xl font-bold vsi-gold mb-6">Portal Customization & Settings</h3>
+                    <div id="settings-container" class="space-y-4 text-left"></div>
+                    <div class="flex justify-end gap-4 pt-4"><button type="button" onclick="closeMainModal()" class="text-gray-400 hover:text-white">Cancel</button><button id="save-settings-btn" class="bg-vsi-gold text-black font-bold py-2 px-6 rounded-md hover:bg-yellow-300">Save Settings</button></div>
+                </div>`;
+            
+            populateSettingsForm();
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+        }
+
+        function populateSettingsForm() {
+            const container = document.getElementById('settings-container');
+            container.innerHTML = `
+                <details class="settings-accordion">
+                    <summary>Display & Audio</summary>
+                    <div class="settings-accordion-content space-y-4">
+                        <div><label class="block text-sm">Theme</label><select id="theme-select" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"><option value="classic">Classic Gold</option><option value="night">Night Ops Blue</option><option value="stealth">Stealth Red</option></select></div>
+                        <div><label class="flex items-center space-x-2"><input type="checkbox" id="sound-toggle" class="form-checkbox h-5 w-5 bg-gray-800 border-gray-600"><span>Enable UI Sounds</span></label></div>
+                    </div>
+                </details>
+                <details class="settings-accordion">
+                    <summary>Portal Identity & Status</summary>
+                    <div class="settings-accordion-content space-y-4">
+                        <div><label class="block text-sm">Operative Name</label><input type="text" id="op-name-input" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"></div>
+                        <div><label class="block text-sm">Operative Status</label><input type="text" id="op-status-input" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"></div>
+                        <div><label class="block text-sm">Handler Name</label><input type="text" id="handler-name-input" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"></div>
+                        <div><label class="block text-sm">Default Comms Reply</label><input type="text" id="comms-reply-input" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"></div>
+                    </div>
+                </details>
+                <details class="settings-accordion">
+                    <summary>Content & Narrative Management</summary>
+                    <div id="content-settings-content" class="settings-accordion-content space-y-4"></div>
+                </details>
+                <details class="settings-accordion">
+                    <summary>Aegis Configuration</summary>
+                     <div class="settings-accordion-content space-y-4">
+                         <div><label class="block text-sm">MLD Project Phase</label><select id="mld-phase-select" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"><option value="1">Phase 1: R&D</option><option value="2">Phase 2: Asset Cultivation</option><option value="3">Phase 3: Crisis Generation</option><option value="4">Phase 4: Kinetic Support</option><option value="5">Phase 5: Stabilization</option><option value="6">Phase 6: Annexation</option></select></div>
+                     </div>
+                </details>
+            `;
+
+            document.getElementById('theme-select').value = dashboardState.theme;
+            document.getElementById('sound-toggle').checked = dashboardState.sounds;
+            document.getElementById('op-name-input').value = dashboardState.operativeName;
+            document.getElementById('op-status-input').value = dashboardState.operativeStatus;
+            document.getElementById('handler-name-input').value = dashboardState.handlerName;
+            document.getElementById('comms-reply-input').value = dashboardState.commsReply;
+            document.getElementById('mld-phase-select').value = dashboardState.mldPhase;
+            
+            const contentSettingsContent = document.getElementById('content-settings-content');
+            contentSettingsContent.innerHTML = ''; 
+            
+            Object.keys(dashboardState.newsArticles).forEach(key => {
+                const article = dashboardState.newsArticles[key];
+                contentSettingsContent.innerHTML += `<div class="border border-gray-700 p-2 rounded-md">
+                        <p class="text-xs text-gray-400">Homepage News: ${key}</p>
+                        <input type="text" data-content-key="newsArticles.${key}.title" class="w-full bg-gray-900 border border-gray-600 rounded-md p-1 mt-1 text-xs" value="${article.title}">
+                        <textarea data-content-key="newsArticles.${key}.content" class="w-full bg-gray-900 border border-gray-600 rounded-md p-2 mt-1 text-xs h-24">${article.content}</textarea>
+                    </div>`;
+            });
+            vlinkContacts.forEach((contact, index) => {
+                 contentSettingsContent.innerHTML += `<div class="border border-gray-700 p-2 rounded-md">
+                        <p class="text-xs text-gray-400">V-Link Voicemail: ${contact.name}</p>
+                        <textarea data-content-key="vlinkContacts.${index}.voicemail" class="w-full bg-gray-900 border border-gray-600 rounded-md p-2 mt-1 text-xs h-16">${contact.voicemail}</textarea>
+                    </div>`;
+             });
+        }
+        
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+            
+            const reader = new FileReader();
+            const targetId = event.target.dataset.targetId;
+            
+            reader.onload = (e) => {
+                const imageUrl = e.target.result;
+                dashboardState.customImages[targetId] = imageUrl;
+                const images = document.querySelectorAll(`#${targetId}`);
+                images.forEach(img => img.src = imageUrl);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function applyCustomImages() {
+             for(const id in dashboardState.customImages) {
+                const images = document.querySelectorAll(`#${id}`);
+                if(images.length > 0) {
+                    images.forEach(img => img.src = dashboardState.customImages[id]);
+                }
+             }
+        }
+
+        function saveSettings(e) {
+            if(e) e.preventDefault();
+            dashboardState.theme = document.getElementById('theme-select').value;
+            dashboardState.sounds = document.getElementById('sound-toggle').checked;
+            dashboardState.mldPhase = parseInt(document.getElementById('mld-phase-select').value);
+            
+            dashboardState.operativeName = document.getElementById('op-name-input').value;
+            dashboardState.operativeStatus = document.getElementById('op-status-input').value;
+            dashboardState.handlerName = document.getElementById('handler-name-input').value;
+            dashboardState.commsReply = document.getElementById('comms-reply-input').value;
+
+            document.querySelectorAll('#content-settings-content [data-content-key]').forEach(el => {
+                const keyPath = el.dataset.contentKey.split('.');
+                let obj = window; 
+                for (let i = 0; i < keyPath.length - 1; i++) {
+                    obj = obj[keyPath[i]];
+                }
+                obj[keyPath[keyPath.length - 1]] = el.value;
+            });
+            
+            applyTheme();
+            updateDashboard();
+            populateMissions(); 
+            updateMapMarkers(); 
+            
+            document.getElementById('news-title-brokentrust').textContent = dashboardState.newsArticles.brokenTrust.title;
+            document.getElementById('news-title-markjansen').textContent = dashboardState.newsArticles.markJansen.title;
+            
+            closeMainModal();
+        }
+
+        function applyTheme() {
+            const root = document.documentElement;
+            if (dashboardState.theme === 'night') {
+                root.style.setProperty('--vsi-accent', '#3b82f6');
+                root.style.setProperty('--vsi-text-dark', '#ffffff'); 
+            } else if (dashboardState.theme === 'stealth') {
+                root.style.setProperty('--vsi-accent', '#ef4444');
+                root.style.setProperty('--vsi-text-dark', '#ffffff'); 
+            } else {
+                root.style.setProperty('--vsi-accent', '#D4AF37');
+                root.style.setProperty('--vsi-text-dark', '#121212');
+            }
+        }
+
+        function playSound(type) {
+            if (!dashboardState.sounds) return;
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) {
+                    console.error("Web Audio API is not supported in this browser.");
+                    return;
+                }
+            }
+            if (ringtoneInterval) {
+                clearInterval(ringtoneInterval); 
+            }
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+            switch(type) {
+                case 'click': oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1); break;
+                case 'success': oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(1046.50, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2); break;
+                case 'alert': oscillator.type = 'sawtooth'; oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3); break;
+                case 'incoming': oscillator.type = 'square'; oscillator.frequency.setValueAtTime(600, audioCtx.currentTime); setTimeout(() => oscillator.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2), 200); gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.4); break;
+                case 'ringing': oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(941, audioCtx.currentTime); const osc2 = audioCtx.createOscillator(); osc2.type = 'sine'; osc2.frequency.setValueAtTime(1477, audioCtx.currentTime); osc2.connect(gainNode); osc2.start(); osc2.stop(audioCtx.currentTime + 0.5); break;
+                case 'logout': oscillator.type = 'triangle'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); oscillator.frequency.exponentialRampToValueAtTime(330, audioCtx.currentTime + 0.5); gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5); break;
+            }
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+        
+        document.getElementById('chimera-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            playSound('click');
+            const output = document.getElementById('chimera-output');
+            output.innerHTML = `<p class="blinking-text">Executing campaign...</p>`;
+            setTimeout(() => {
+                playSound('success');
+                const sentimentShift = (Math.random() * 5).toFixed(1);
+                const adoptionRate = (Math.random() * 20 + 5).toFixed(1);
+                const narrative = document.getElementById('chimera-narrative').value;
+                const target = document.getElementById('chimera-target').value;
+                output.innerHTML = `
+                    <p class="text-green-400">Campaign Complete</p>
+                    <p class="text-sm"><strong>Narrative:</strong> "${narrative}"</p>
+                    <p class="text-sm"><strong>Target:</strong> ${target}</p>
+                    <p class="text-sm"><strong>Observed Sentiment Shift:</strong> +${sentimentShift}%</p>
+                    <p class="text-sm"><strong>Narrative Adoption Rate:</strong> ${adoptionRate}%</p>
+                    <p class="text-xs text-gray-500 mt-2">Analysis complete. Monitoring for long-term effects.</p>
+                `;
+            }, 3000);
+        });
+
+        document.getElementById('contact-form').addEventListener('submit', (e) => { e.preventDefault(); alert('Secure transmission successful. A representative will be in contact.'); });
+   
+        function showNewsModal(articleId) {
+            const article = dashboardState.newsArticles[articleId];
+            modalContent.innerHTML = `<div class="p-6 text-left"><h3 class="text-xl font-bold vsi-gold mb-4">${article.title}</h3><p>${article.content}</p><button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md hover:bg-gray-500 transition-colors">Close</button></div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function showExfilModal() {
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-red-500 mb-4">CONFIRM EXTRACTION PROTOCOL</h3>
+                    <p class="text-gray-300 mb-6">This action is irreversible and will initiate a Level 5 response. Are you sure you wish to proceed?</p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="closeMainModal()" class="bg-gray-600 text-white font-bold px-6 py-2 rounded-md">CANCEL</button>
+                        <button onclick="initiateExfilSequence()" class="bg-red-600 text-white font-bold px-6 py-2 rounded-md">CONFIRM</button>
+                    </div>
+                </div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        function initiateExfilSequence() {
+            modalContent.innerHTML = `
+                <div id="exfil-interface" class="p-6 space-y-4 text-center">
+                    <p id="exfil-status" class="text-2xl font-bold text-yellow-400 font-mono blinking-text">INITIATING AEGIS EXTRACTION PROTOCOL...</p>
+                    <div id="exfil-details" class="hidden text-left text-sm space-y-2"></div>
+                    <div id="exfil-map-container" class="hidden relative w-full h-64 bg-black border border-gray-600 mt-4 overflow-hidden">
+                        <div class="exfil-map-dot" style="top: 50%; left: 50%;"></div>
+                        <div id="qrf-squad"></div>
+                    </div>
+                </div>`;
+
+            let step = 0;
+            const statusEl = document.getElementById('exfil-status');
+            const detailsEl = document.getElementById('exfil-details');
+            const mapContainer = document.getElementById('exfil-map-container');
+
+            const sequence = setInterval(() => {
+                step++;
+                switch(step) {
+                    case 1:
+                        statusEl.textContent = "FIRING SECURE BEACON...";
+                        playSound('alert');
+                        break;
+                    case 2:
+                        statusEl.textContent = "UPLINKING BIOMETRICS TO QRF...";
+                        break;
+                    case 3:
+                        statusEl.textContent = "QRF ACKNOWLEDGED // STAND BY FOR DETAILS";
+                        statusEl.classList.remove('blinking-text', 'text-yellow-400');
+                        statusEl.classList.add('text-green-400');
+                        playSound('success');
+                        break;
+                    case 4:
+                        detailsEl.classList.remove('hidden');
+                        mapContainer.classList.remove('hidden');
+                        detailsEl.innerHTML = `
+                            <p><strong>QRF ETA:</strong> <span id="qrf-eta" class="font-mono text-vsi-gold">00:05:00</span></p>
+                            <p><strong>EXFIL METHOD:</strong> V-44 'Osprey' VTOL</p>
+                            <p><strong>CALLSIGN:</strong> SANDMAN-1</p>
+                            <p><strong>RV POINT:</strong> Your current location (Hamilton, ON)</p>
+                            <p class="text-yellow-400 mt-2"><strong>DIRECTIVE:</strong> Sanitize location. Destroy all compromising materials. Proceed to designated rooftop extraction point.</p>
+                        `;
+                        startQRFCountdown();
+                        startQRFMapAnimation();
+                        break;
+                    case 5:
+                        clearInterval(sequence);
+                        break;
+                }
+            }, 1500);
+        }
+
+        function startQRFCountdown() {
+            const etaEl = document.getElementById('qrf-eta');
+            let duration = 300; // 5 minutes
+            const timer = setInterval(() => {
+                duration--;
+                if (!document.getElementById('qrf-eta')) { // Check if modal is closed
+                    clearInterval(timer);
+                    return;
+                }
+                const minutes = Math.floor(duration / 60).toString().padStart(2, '0');
+                const seconds = (duration % 60).toString().padStart(2, '0');
+                etaEl.textContent = `${minutes}:${seconds}`;
+                if (duration <= 0) {
+                    clearInterval(timer);
+                    const statusEl = document.getElementById('exfil-status');
+                    statusEl.textContent = "QRF ON STATION. PROCEED TO ROOFTOP. HURRY.";
+                    statusEl.classList.add('blinking-text');
+                }
+            }, 1000);
+        }
+
+        function startQRFMapAnimation() {
+            const squadEl = document.getElementById('qrf-squad');
+            if (!squadEl) return;
+            squadEl.innerHTML = '';
+            const qrfPositions = [
+                { top: 5, left: 5 }, { top: 10, left: 15 }, { top: 5, left: 25 }
+            ];
+            
+            qrfPositions.forEach((pos, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'exfil-map-dot';
+                dot.id = `qrf-dot-${i}`;
+                dot.style.top = `${pos.top}%`;
+                dot.style.left = `${pos.left}%`;
+                squadEl.appendChild(dot);
+            });
+            
+            let progress = 0;
+            if (qrfInterval) clearInterval(qrfInterval);
+            qrfInterval = setInterval(() => {
+                progress += 0.5; // Controls speed
+                qrfPositions.forEach((pos, i) => {
+                    const dot = document.getElementById(`qrf-dot-${i}`);
+                    if(dot) {
+                        const newTop = pos.top + (50 - pos.top) * (progress / 100);
+                        const newLeft = pos.left + (50 - pos.left) * (progress / 100);
+                        dot.style.top = `${newTop}%`;
+                        dot.style.left = `${newLeft}%`;
+                    }
+                });
+                if (progress >= 100) {
+                    clearInterval(qrfInterval);
+                }
+            }, 1500);
+        }
+
+        function cycleLiveStatus() {
+            const feed = document.getElementById('live-status-feed');
+            if (!feed) return;
+            
+            function typeReport(report) {
+                feed.innerHTML = `
+                    <div><span class="text-green-400">> LOCATION:</span> ${report.location}</div>
+                    <div><span class="text-yellow-400">> STATUS:</span> ${report.status}</div>
+                    <div class="mt-2 text-gray-400">> REPORT: <span id="report-text"></span></div>
+                `;
+                const textEl = document.getElementById('report-text');
+                let i = 0;
+                if(typeInterval) clearInterval(typeInterval);
+                typeInterval = setInterval(() => {
+                    if (i < report.blurb.length) {
+                        textEl.innerHTML += report.blurb.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(typeInterval);
+                    }
+                }, 50);
+            }
+            
+            typeReport(global_reports[currentReportIndex]);
+            
+            setInterval(() => {
+                currentReportIndex = (currentReportIndex + 1) % global_reports.length;
+                typeReport(global_reports[currentReportIndex]);
+            }, 10000); // Cycle every 10 seconds
+        }
+
+        function showImageManagerModal() {
+            modalContent.innerHTML = `
+                <div class="p-8 overflow-y-auto max-h-[90vh] w-full">
+                    <h3 class="text-2xl font-bold vsi-gold mb-6">Asset Customization</h3>
+                    <div id="image-settings-content" class="space-y-4 text-left"></div>
+                    <button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md hover:bg-gray-500 transition-colors">Close</button>
+                </div>`;
+            
+            const imageSettingsContent = document.getElementById('image-settings-content');
+            const imageTargets = [
+                { id: 'corp-logo', label: 'Corporate Logo (Header)' },
+                { id: 'hero-logo', label: 'Corporate Logo (Hero)' },
+                { id: 'aegis-logo', label: 'Aegis Portal Logo' },
+                { id: 'sandra-warren-img', label: 'Sandra Warren Photo' }
+            ];
+            imageSettingsContent.innerHTML = imageTargets.map(img => `
+                <div class="flex justify-between items-center">
+                    <label for="img-input-${img.id}" class="text-sm">${img.label}</label>
+                    <input type="file" id="img-input-${img.id}" data-target-id="${img.id}" accept="image/png" class="text-xs file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-600">
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('#image-settings-content input[type="file"]').forEach(input => {
+                input.addEventListener('change', handleImageUpload);
+            });
+
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        
+        document.addEventListener('DOMContentLoaded', (event) => {
+            cycleLiveStatus();
+        });
+
+    </script>
+</body>
+</html>

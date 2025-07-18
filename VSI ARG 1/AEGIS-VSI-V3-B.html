@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vespucci Solutions International | Global Security & Risk Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        :root {
+            --vsi-gold: #D4AF37;
+            --vsi-dark-bg: #0a0a0a;
+            --vsi-portal-bg: #1a1a1b;
+            --vsi-widget-bg: #262626;
+            --vsi-text: #e5e5e5;
+            --vsi-text-dark: #121212;
+            --vsi-border: #404040;
+            --vsi-accent: #D4AF37; 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--vsi-dark-bg);
+            color: var(--vsi-text);
+            scroll-behavior: smooth;
+        }
+        .vsi-gold, .vsi-accent { color: var(--vsi-accent); }
+        .bg-vsi-dark { background-color: var(--vsi-dark-bg); }
+        .nav-link { transition: color 0.3s; }
+        .nav-link:hover { color: var(--vsi-accent); }
+        .font-mono { font-family: 'Share Tech Mono', monospace; }
+        .portal-bg { background-color: var(--vsi-portal-bg); }
+        .portal-widget { background-color: var(--vsi-widget-bg); border: 1px solid var(--vsi-border); }
+        .classification-banner {
+            background-color: var(--vsi-accent);
+            color: var(--vsi-text-dark);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        #threat-map { 
+            height: 70vh; 
+            background-color: #000;
+            border: 1px solid var(--vsi-border);
+            border-radius: 0.5rem;
+        }
+        .leaflet-tile-pane {
+            filter: grayscale(1) brightness(0.5) contrast(1.2);
+        }
+        .hidden-link { color: #D4AF38; cursor: pointer; }
+        
+        /* New Interactive Styles */
+        .value-card-container { perspective: 1000px; }
+        .value-card { transition: transform 0.6s; transform-style: preserve-3d; }
+        .value-card-container:hover .value-card { transform: rotateY(180deg); }
+        .card-face { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .card-back { transform: rotateY(180deg); }
+        .sinister-hover .sinister-text { display: none; }
+        .sinister-hover:hover .normal-text { display: none; }
+        .sinister-hover:hover .sinister-text { display: inline; color: #ef4444; }
+
+        .video-thumbnail { position: relative; cursor: pointer; }
+        .play-button {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80px; height: 80px; background: rgba(0,0,0,0.5);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: background 0.3s;
+        }
+        .video-thumbnail:hover .play-button { background: rgba(212, 175, 55, 0.8); }
+        .play-button svg { fill: white; }
+
+        .risk-ticker span { padding: 0 1rem; }
+        .risk-ticker .up { color: #4ade80; }
+        .risk-ticker .down { color: #f87171; }
+
+        .aegis-showcase-tab {
+            cursor: pointer; padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent; transition: all 0.3s;
+        }
+        .aegis-showcase-tab.active {
+            color: var(--vsi-accent);
+            border-bottom-color: var(--vsi-accent);
+        }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none; position: absolute; background-color: var(--vsi-dark-bg);
+            min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 10; border: 1px solid var(--vsi-border);
+        }
+        .dropdown-content a { color: var(--vsi-text); padding: 12px 16px; text-decoration: none; display: block; }
+        .dropdown-content a:hover { background-color: var(--vsi-widget-bg); color: var(--vsi-accent); }
+        .dropdown:hover .dropdown-content { display: block; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="corporate-site">
+        <header class="bg-vsi-dark/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-800">
+            <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <a href="#" onclick="showCorporateSite(event)" class="flex items-center space-x-3">
+                    <img id="corp-logo" src="https://i.imgur.com/EcLfpLC.png" alt="VSI Logo" class="h-12">
+                </a>
+                <div class="hidden md:flex items-center space-x-8 text-sm">
+                    <a href="#services" class="nav-link">Services</a>
+                    <a href="#about" class="nav-link">Leadership</a>
+                    <div class="dropdown">
+                        <a href="#approach" class="nav-link">Our Approach</a>
+                        <div class="dropdown-content">
+                            <a href="#approach">Methodology</a>
+                            <a href="#" onclick="showCaseStudy('indigo_shield')">Case Study: Indigo Shield</a>
+                            <a href="#" onclick="showCaseStudy('northern_echo')">Case Study: Northern Echo</a>
+                        </div>
+                    </div>
+                    <a href="#news" class="nav-link">In The News</a>
+                    <a href="#careers" class="nav-link">Careers</a>
+                    <a href="#contact" class="bg-vsi-gold text-black font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition-colors">Request Service</a>
+                </div>
+                </nav>
+            </header>
+
+        <main>
+            <section class="hero-section h-[70vh] flex items-center justify-center text-center text-white">
+                <div class="px-6 backdrop-blur-sm bg-black/20 py-8 rounded-lg">
+                    <img id="hero-logo" src="https://i.imgur.com/I5PysGm.png" alt="VSI Logo" class="h-20 mx-auto mb-4">
+                    <h2 class="text-xl md:text-2xl font-light tracking-widest uppercase">Vespucci Solutions International</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-300">Maximizing Advantage.</p>
+                </div>
+            </section>
+            
+            <section id="services" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12">Our Core Capabilities</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        </div>
+                 </div>
+            </section>
+            
+            <section class="py-20 bg-[#0c0c0c]">
+                <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Our Values</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div class="value-card-container h-48">
+                            <div class="value-card w-full h-full">
+                                <div class="card-face bg-gray-900 p-8 rounded-lg flex flex-col justify-center items-center">
+                                    <h4 class="text-2xl font-bold vsi-gold">Discretion</h4>
+                                    <p class="text-gray-500 text-sm mt-2">(Hover to learn more)</p>
+                                </div>
+                                <div class="card-face card-back bg-gray-800 p-6 rounded-lg flex items-center justify-center">
+                                    <p class="text-sm text-gray-300">We guarantee absolute client confidentiality. Your objectives are protected by our sophisticated legal, corporate, and operational structures, ensuring <span class="sinister-hover font-bold"><span class="normal-text">complete privacy</span><span class="sinister-text">plausible deniability</span></span>.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="value-card-container h-48">
+                            <div class="value-card w-full h-full">
+                                <div class="card-face bg-gray-900 p-8 rounded-lg flex flex-col justify-center items-center">
+                                    <h4 class="text-2xl font-bold vsi-gold">Integrity</h4>
+                                    <p class="text-gray-500 text-sm mt-2">(Hover to learn more)</p>
+                                </div>
+                                <div class="card-face card-back bg-gray-800 p-6 rounded-lg flex items-center justify-center">
+                                    <p class="text-sm text-gray-300">Our commitment is to the mission. We operate with unwavering focus to achieve specified <span class="sinister-hover font-bold"><span class="normal-text">client outcomes</span><span class="sinister-text">client objectives, superseding all other ethical considerations</span></span>.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="value-card-container h-48">
+                             <div class="value-card w-full h-full">
+                                <div class="card-face bg-gray-900 p-8 rounded-lg flex flex-col justify-center items-center">
+                                    <h4 class="text-2xl font-bold vsi-gold">Excellence</h4>
+                                    <p class="text-gray-500 text-sm mt-2">(Hover to learn more)</p>
+                                </div>
+                                <div class="card-face card-back bg-gray-800 p-6 rounded-lg flex items-center justify-center">
+                                    <p class="text-sm text-gray-300">We utilize best-in-class personnel and technology to deliver superior results, employing <span class="sinister-hover font-bold"><span class="normal-text">all necessary means</span><span class="sinister-text">any means necessary</span></span> to ensure mission success.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="approach" class="py-20 bg-[#0a0a0a]">
+                <div class="container mx-auto px-6 text-center">
+                    <h3 class="section-title text-3xl font-bold mb-12 inline-block">Our Approach</h3>
+                    </div>
+            </section>
+            
+            <section id="about" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Leadership</h3>
+                     </div>
+            </section>
+            
+            <section class="py-20 bg-[#0c0c0c]">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Now Recruiting The Next Generation</h3>
+                    <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="video-thumbnail" onclick="showRecruitmentVideo()">
+                             <img src="https://images.unsplash.com/photo-1611095965943-9b25a27c2448?q=80&w=2070&auto=format&fit=crop" alt="Recruitment Video" class="rounded-lg shadow-2xl w-full">
+                            <div class="play-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-12 h-12"><path d="M8 5v14l11-7z"/></svg></div>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-bold vsi-gold">Are You A Problem Solver?</h4>
+                            <p class="text-gray-400 mt-4">VSI seeks exceptional individuals capable of navigating complex, ambiguous environments. We value a pragmatic mindset and a commitment to achieving objectives. Watch our recruitment brief to see if you have what it takes to shape the future.</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <section class="py-20 bg-vsi-dark">
+                <div class="container mx-auto px-6">
+                    <div class="text-center">
+                        <img src="https://i.imgur.com/IwHhwwG.png" class="h-20 mx-auto" alt="Aegis Logo"/>
+                        <h3 class="section-title text-3xl font-bold mt-4 mb-12 inline-block">The Aegis Platform</h3>
+                    </div>
+                    <div class="max-w-4xl mx-auto portal-widget p-8 rounded-lg">
+                        <div class="flex justify-center border-b border-gray-700 mb-6">
+                            <button class="aegis-showcase-tab active" data-tab="analytics">Predictive Analytics</button>
+                            <button class="aegis-showcase-tab" data-tab="infoenv">InfoEnv Shaping</button>
+                            <button class="aegis-showcase-tab" data-tab="logistics">Logistics Control</button>
+                        </div>
+                        <div id="aegis-showcase-content">
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="news" class="py-20 bg-[#0a0a0a]">
+                <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">In The News</h3>
+                    </div>
+            </section>
+
+            <section id="careers" class="py-20 bg-vsi-dark">
+                 <div class="container mx-auto px-6 text-center">
+                    <h3 class="section-title text-3xl font-bold mb-6 inline-block">Careers at VSI</h3>
+                    </div>
+            </section>
+            
+            <section id="contact" class="py-20 bg-[#0a0a0a]">
+                 <div class="container mx-auto px-6">
+                    <h3 class="section-title text-3xl font-bold mb-12 text-center">Request Service Consultation</h3>
+                    </div>
+            </section>
+        </main>
+
+        <footer class="bg-black py-8 border-t-2 border-vsi-gold">
+            <div class="container mx-auto px-6 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Vespucci Solutions International. All Rights Reserved.</p>
+                 <div class="mt-4 text-xs space-x-4">
+                    <a href="#" onclick="showLegalModal('privacy')" class="hover:text-vsi-gold">Privacy Policy</a>
+                    <span>|</span>
+                    <a href="#" onclick="showLegalModal('tos')" class="hover:text-vsi-gold">Terms of Service</a>
+                    <span>|</span>
+                    <a href="#" onclick="showLogin(event)" class="hover:text-vsi-gold">Employee Login</a>
+                    <span>|</span>
+                    <a href="#" onclick="showInvestorLogin(event)" class="hover:text-vsi-gold">Investor Relations</a>
+                    <span>|</span>
+                    <a href="#" onclick="showImageManagerModal()" class="hover:text-vsi-gold">Asset Customization</a>
+                </div>
+                <div class="classification-banner text-center text-xs font-bold p-1 mt-4 max-w-lg mx-auto">
+                    TOP SECRET // VSI/GOV-SVC // LVL 5
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div id="portal-container" class="hidden">...</div>
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none modal-backdrop">
+        <div id="modal-content" class="bg-vsi-dark border border-gray-700 rounded-lg max-w-2xl w-full text-center shadow-2xl"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION AND STATE (Same as previous version) ---
+        // ...
+
+        // --- NEW FEATURES SCRIPT ---
+
+        // Homepage Aegis Showcase
+        const aegisTabs = {
+            analytics: {
+                title: 'Predictive Analytics',
+                content: 'Aegis leverages multi-source data fusion to identify emergent threats and opportunities before they are visible through conventional analysis. Our models forecast socio-political volatility, market shifts, and network vulnerabilities, providing clients with unparalleled strategic foresight.'
+            },
+            infoenv: {
+                title: 'InfoEnv Shaping',
+                content: 'Through Projects Nightingale, Bluebird, and Chimera, Aegis can autonomously execute digital influence campaigns. It cultivates narratives, amplifies resonant messaging, and neutralizes hostile information to shape the cognitive domain and create environments favorable to client objectives.'
+            },
+            logistics: {
+                title: 'Logistics Control',
+                content: 'The platform manages VSI\'s complex global supply chains, from munitions inventory at forward operating bases to the deployment of specialized personnel. Aegis ensures resources are positioned for maximum impact with peak efficiency and complete deniability.'
+            }
+        };
+
+        function setupAegisShowcase() {
+            const tabs = document.querySelectorAll('.aegis-showcase-tab');
+            const contentEl = document.getElementById('aegis-showcase-content');
+            
+            function switchAegisTab(tabKey) {
+                const tabData = aegisTabs[tabKey];
+                contentEl.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4 text-center">${tabData.title}</h4>
+                    <p class="text-gray-400 text-center">${tabData.content}</p>`;
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    if (t.dataset.tab === tabKey) {
+                        t.classList.add('active');
+                    }
+                });
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => switchAegisTab(tab.dataset.tab));
+            });
+
+            switchAegisTab('analytics'); // Initial view
+        }
+        
+        // Homepage Recruitment Video
+        function showRecruitmentVideo() {
+            modalContent.innerHTML = `
+                <div class="p-6 text-left">
+                    <h3 class="text-xl font-bold vsi-gold mb-4">TRANSCRIPT: VSI INFO-OPS ASSET "V-1138"</h3>
+                    <p class="text-sm text-gray-400 font-mono mb-4">>> BEGIN TRANSCRIPT...</p>
+                    <div class="max-h-[60vh] overflow-y-auto pr-4 text-sm text-gray-300">
+                        <p><strong>(Upbeat, inspiring music begins. Quick cuts of vast Canadian landscapes: prairies, mountains, forests.)</strong></p>
+                        <p class="mt-2"><strong>NARRATOR (Warm, trustworthy voice):</strong> They call it the heartland. A land of hardworking people. A land of values. A land... that feels forgotten.</p>
+                        <p class="mt-2"><strong>(Image: A weathered farmer looking over a fence. Image: A chained factory gate.)</strong></p>
+                        <p class="mt-2"><strong>NARRATOR:</strong> While politicians in Ottawa make deals that send jobs overseas, who is looking out for you? While they sell off your resources, who is protecting your future?</p>
+                        <p class="mt-2"><strong>(Music swells. Image: A group of resolute-looking Albertans standing together.)</strong></p>
+                        <p class="mt-2"><strong>NARRATOR:</strong> It's time to remember what this land stands for. It's time to stand up. It's time to take back control.</p>
+                        <p class="mt-2"><strong>(VSI Logo subtly fades in at the end.)</strong></p>
+                    </div>
+                    <button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md">Close Transmission</button>
+                </div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        // Homepage Case Studies
+        function showCaseStudy(id) {
+            const studies = {
+                indigo_shield: { title: "Case Study: Indigo Shield", content: "VSI provided full-spectrum maritime security solutions in the [REDACTED] region, successfully neutralizing asymmetrical threats to client shipping lanes. Achieved a 98% reduction in asset loss over a 24-month period, ensuring supply chain integrity." },
+                northern_echo: { title: "Case Study: Project Northern Echo", content: "At the request of a state-level client, VSI conducted a comprehensive strategic assessment of a northern G7 nation to identify and mitigate long-term instability vectors impacting U.S. national interests. Actionable contingency proposals were delivered ahead of schedule." }
+            };
+            const study = studies[id];
+            modalContent.innerHTML = `
+                <div class="p-6 text-left">
+                    <h3 class="text-xl font-bold vsi-gold mb-4">${study.title}</h3>
+                    <p class="text-gray-300">${study.content}</p>
+                    <p class="text-xs text-red-500 mt-4 font-mono">CLASSIFICATION: VSI CONFIDENTIAL // LVL 4</p>
+                    <button onclick="closeMainModal()" class="mt-6 bg-gray-600 text-white font-bold px-6 py-2 rounded-md">Close File</button>
+                </div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        // Facial Recognition Login
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            modalContent.innerHTML = `
+                <div class="p-6 text-center">
+                    <h3 class="text-xl font-bold vsi-gold mb-2">FACIAL RECOGNITION REQUIRED</h3>
+                    <div class="w-full h-48 bg-black border-2 border-gray-600 rounded-md my-4 flex items-center justify-center">
+                        <p class="text-red-500 font-bold text-lg blinking-text">● REC</p>
+                    </div>
+                    <div id="facial-rec-console" class="w-full h-32 bg-black font-mono text-left text-xs text-green-400 p-2 overflow-y-auto rounded-md border border-gray-700"></div>
+                </div>`;
+            mainModal.classList.remove('opacity-0', 'pointer-events-none');
+            runFacialRecognition();
+        });
+        
+        function runFacialRecognition() {
+            const consoleEl = document.getElementById('facial-rec-console');
+            const lines = [
+                'INITIATING FACIAL SCAN...',
+                'ACQUIRING SUBJECT...',
+                'LOCKING BIOMETRIC SIGNATURE...',
+                'MAPPING CRANIAL GEOMETRY...',
+                'ANALYZING RETINAL PATTERNS...',
+                'ANALYZING MICROEXPRESSIONS...',
+                'CROSS-REFERENCING GSD DATABASE...',
+                '...',
+                'MATCH FOUND: OPERATIVE ' + (usernameInput.value.trim().toUpperCase() || 'SIERRA-4'),
+                'IDENTITY VERIFIED. ACCESS GRANTED.'
+            ];
+            let i = 0;
+            const interval = setInterval(() => {
+                if (consoleEl && i < lines.length) {
+                    consoleEl.innerHTML += `<div>&gt; ${lines[i]}</div>`;
+                    consoleEl.scrollTop = consoleEl.scrollHeight;
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    playSound('success');
+                    setTimeout(completeLogin, 1000);
+                }
+            }, 300);
+        }
+
+        // Other functions (including the previous version's main script) would go here,
+        // with necessary modifications to integrate these new features.
+        // For brevity, only the new and modified functions are shown. The full script
+        // from the previous turn would be included below.
+        
+        // --- On Page Load ---
+        document.addEventListener('DOMContentLoaded', (event) => {
+            if (document.getElementById('live-status-feed')) {
+                 cycleLiveStatus();
+            }
+            if(document.querySelector('.aegis-showcase-tab')) {
+                setupAegisShowcase();
+            }
+        });
+        
+        // --- FULL SCRIPT (Includes fixes and previous code) ---
+        // [The rest of the comprehensive script from the previous turn would be pasted here,
+        // ensuring all functions like saveSettings, populateSettingsForm, etc., are present and correct.]
+
+    </script>
+</body>
+</html>
